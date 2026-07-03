@@ -4,5 +4,7 @@ module.exports = {
   },
   defineConstants: {},
   mini: {},
-  h5: {},
+  h5: {
+    publicPath: '/test/',
+  },
 };
