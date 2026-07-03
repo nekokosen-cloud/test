@@ -96,21 +96,31 @@ function addCorridorSegment(group, start, end, width, theme, holes) {
 }
 
 function addHole(group, hole, theme) {
-  const depth = 0.35;
+  const depth = 0.4;
   const pit = new THREE.Mesh(
-    new THREE.CylinderGeometry(hole.radius * 0.92, hole.radius * 0.75, depth, 28),
+    new THREE.CylinderGeometry(hole.radius * 0.95, hole.radius * 0.8, depth, 28),
     makeMaterial(theme.hole, { roughness: 1, metalness: 0 })
   );
-  pit.position.set(hole.x, -depth * 0.5 + 0.02, hole.z);
+  pit.position.set(hole.x, -depth * 0.5 + 0.01, hole.z);
   group.add(pit);
 
+  const ringColor = hole.goal === false ? 0x882222 : 0x1a0a00;
   const ring = new THREE.Mesh(
-    new THREE.TorusGeometry(hole.radius, 0.018, 8, 32),
-    makeMaterial(hole.goal === false ? 0x661111 : 0x2d1808, { roughness: 0.9 })
+    new THREE.TorusGeometry(hole.radius, 0.022, 8, 32),
+    makeMaterial(ringColor, { roughness: 0.9 })
   );
   ring.rotation.x = Math.PI / 2;
-  ring.position.set(hole.x, 0.055, hole.z);
+  ring.position.set(hole.x, 0.058, hole.z);
   group.add(ring);
+
+  if (hole.goal) {
+    const flag = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.015, 0.015, 0.28, 8),
+      makeMaterial(0xcc2222, { roughness: 0.5 })
+    );
+    flag.position.set(hole.x + hole.radius * 0.5, 0.2, hole.z);
+    group.add(flag);
+  }
 }
 
 function addStartMark(group, spawn) {

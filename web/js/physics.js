@@ -107,14 +107,15 @@ export function resetBall(state, level) {
   state.mode = "rolling";
 }
 
-export function stepBall(state, level, tiltX, tiltZ, dt) {
+export function stepBall(state, level, gravityX, gravityZ, dt) {
   const radius = level.ballRadius;
-  const gravity = 14;
-  const maxSpeed = 5.8;
+  const gravity = 18;
+  const maxSpeed = 6.2;
 
   if (state.mode === "rolling" && state.supported) {
-    state.vx += Math.sin(tiltX) * gravity * dt;
-    state.vz += Math.sin(tiltZ) * gravity * dt;
+    // 重力方向由手机倾斜决定，盘子不动
+    state.vx += gravityX * gravity * dt;
+    state.vz += gravityZ * gravity * dt;
 
     const friction = Math.pow(0.08, dt);
     state.vx *= 1 - friction;
