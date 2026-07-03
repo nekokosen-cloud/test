@@ -1,0 +1,20 @@
+@import './components/PixelUI/index.scss';
+
+page {
+  background-color: #2A4A3A;
+  font-family: 'Courier New', 'PingFang SC', 'Microsoft YaHei', monospace;
+  color: #3E2731;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: 'PixelFont';
+  src: local('Courier New');
+}
+
+.pixel-font {
+  font-family: 'PixelFont', 'Courier New', monospace;
+}

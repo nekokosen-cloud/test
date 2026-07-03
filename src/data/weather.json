@@ -1,0 +1,26 @@
+[
+  {
+    "id": "sunny",
+    "name": "晴天",
+    "skyOverlay": "rgba(255, 220, 100, 0.15)",
+    "description": "阳光明媚，常见鱼类更容易上钩。"
+  },
+  {
+    "id": "cloudy",
+    "name": "多云",
+    "skyOverlay": "rgba(180, 190, 200, 0.25)",
+    "description": "天空阴沉，各类鱼种出现概率均衡。"
+  },
+  {
+    "id": "rainy",
+    "name": "雨天",
+    "skyOverlay": "rgba(100, 120, 150, 0.35)",
+    "description": "细雨绵绵，稀有鱼类活跃起来。"
+  },
+  {
+    "id": "foggy",
+    "name": "雾天",
+    "skyOverlay": "rgba(200, 210, 220, 0.55)",
+    "description": "浓雾弥漫，神秘鱼种悄然现身。"
+  }
+]

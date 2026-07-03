@@ -1,0 +1,199 @@
+.encyclopedia-page {
+  min-height: 100vh;
+  background: #2A4A3A;
+  padding-bottom: 20px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #3E2731;
+  }
+
+  &__back {
+    cursor: pointer;
+  }
+
+  &__back-text {
+    color: #E8A838;
+    font-size: 14px;
+    font-family: 'Courier New', monospace;
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #FFF8E7;
+    font-family: 'Courier New', monospace;
+  }
+
+  &__progress {
+    font-size: 14px;
+    color: #E8A838;
+    font-family: 'Courier New', monospace;
+  }
+
+  &__progress-bar {
+    height: 6px;
+    background: #1A2A20;
+    margin: 0 16px;
+  }
+
+  &__progress-fill {
+    height: 100%;
+    background: #E8A838;
+    transition: width 0.3s;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 16px;
+    max-width: 375px;
+    margin: 0 auto;
+  }
+
+  &__cell {
+    background: #FFF8E7;
+    border: 2px solid #3E2731;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+
+    &:active {
+      background: #F0E8D0;
+    }
+
+    &--locked {
+      background: #333;
+      border-color: #555;
+      cursor: default;
+
+      &:active {
+        background: #333;
+      }
+    }
+  }
+
+  &__fish-sprite {
+    width: 48px;
+    height: 36px;
+    border: 2px solid #3E2731;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    image-rendering: pixelated;
+  }
+
+  &__fish-unknown {
+    font-size: 20px;
+    font-weight: bold;
+    color: #888;
+  }
+
+  &__fish-name {
+    font-size: 11px;
+    color: #3E2731;
+    margin-top: 4px;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+  }
+
+  &__cell--locked &__fish-name {
+    color: #888;
+  }
+
+  &__fish-count {
+    font-size: 10px;
+    color: #888;
+    margin-top: 2px;
+  }
+}
+
+.fish-detail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+
+  &__content {
+    width: 90%;
+    max-width: 320px;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+  }
+
+  &__sprite {
+    width: 80px;
+    height: 60px;
+    border: 3px solid #3E2731;
+    image-rendering: pixelated;
+  }
+
+  &__rarity {
+    font-size: 12px;
+    color: #888;
+  }
+
+  &__desc {
+    font-size: 13px;
+    color: #555;
+    text-align: center;
+    line-height: 1.5;
+    padding: 0 8px;
+  }
+
+  &__section {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  &__section-title {
+    font-size: 12px;
+    font-weight: bold;
+    color: #3E2731;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  &__stats {
+    width: 100%;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #DDD;
+  }
+
+  &__stat {
+    font-size: 12px;
+    color: #666;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+  }
+}

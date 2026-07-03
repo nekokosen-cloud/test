@@ -1,0 +1,7 @@
+{
+  "description": "私有配置，请填入你的 AppID",
+  "projectname": "pixel-fishing",
+  "setting": {
+    "compileHotReLoad": true
+  }
+}

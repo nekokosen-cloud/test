@@ -1,0 +1,38 @@
+[
+  {
+    "id": "lake",
+    "name": "静谧湖泊",
+    "description": "蓝绿色的平静水面，芦苇随风轻摇。",
+    "skyColor": "#87CEEB",
+    "waterColor": "#5FA088",
+    "accentColor": "#7AAD6A",
+    "maxRarity": "rare"
+  },
+  {
+    "id": "river",
+    "name": "山涧溪流",
+    "description": "清澈的流水穿过岩石，发出潺潺声响。",
+    "skyColor": "#A8C8E0",
+    "waterColor": "#4A90A8",
+    "accentColor": "#8B7355",
+    "maxRarity": "uncommon"
+  },
+  {
+    "id": "ocean",
+    "name": "海边码头",
+    "description": "波浪拍打着栈桥，海鸥在头顶盘旋。",
+    "skyColor": "#6BB5E0",
+    "waterColor": "#2E6B8A",
+    "accentColor": "#C4A060",
+    "maxRarity": "epic"
+  },
+  {
+    "id": "pond",
+    "name": "村庄池塘",
+    "description": "睡莲点缀的池塘，木栏围绕，宁静祥和。",
+    "skyColor": "#B8D8A0",
+    "waterColor": "#6B9A70",
+    "accentColor": "#8B6040",
+    "maxRarity": "common"
+  }
+]
