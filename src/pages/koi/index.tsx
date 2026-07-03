@@ -15,7 +15,7 @@ import type { KoiSkin } from '@/types';
 import './index.scss';
 
 const GAME_WIDTH = 375;
-const GAME_HEIGHT = 320;
+const GAME_HEIGHT = 480;
 const IS_DEV = process.env.NODE_ENV === 'development';
 
 function StatBar({
