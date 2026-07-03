@@ -84,9 +84,10 @@ function constrainToBoardRim(state, level, radius) {
 }
 
 export function createBallState(level) {
+  const floorY = 0.08;
   return {
     x: level.spawn.x,
-    y: level.ballRadius,
+    y: level.ballRadius + floorY,
     z: level.spawn.z,
     vx: 0,
     vz: 0,
@@ -97,8 +98,9 @@ export function createBallState(level) {
 }
 
 export function resetBall(state, level) {
+  const floorY = 0.08;
   state.x = level.spawn.x;
-  state.y = level.ballRadius;
+  state.y = level.ballRadius + floorY;
   state.z = level.spawn.z;
   state.vx = 0;
   state.vz = 0;
@@ -138,7 +140,7 @@ export function stepBall(state, level, gravityX, gravityZ, dt) {
       state.mode = "dropping";
       state.vy = -0.05;
     } else {
-      state.y = radius;
+      state.y = radius + 0.08;
     }
   } else if (state.mode === "dropping") {
     state.vy -= gravity * 1.35 * dt;

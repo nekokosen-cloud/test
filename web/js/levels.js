@@ -5,10 +5,10 @@ export const LEVELS = [
     timeLimit: 60,
     theme: "wood",
     board: { halfW: 4.6, halfD: 4.6 },
-    ballRadius: 0.11,
+    ballRadius: 0.16,
     fallThreshold: -1.5,
     spawn: { x: -3.4, z: -3.4 },
-    holes: [{ x: 3.0, z: 3.48, radius: 0.26, goal: true }],
+    holes: [{ x: 3.0, z: 3.48, radius: 0.32, goal: true }],
     segments: [
       { from: { x: -3.4, z: -3.4 }, to: { x: -3.4, z: -0.6 }, width: 1.05 },
       { from: { x: -3.4, z: -0.6 }, to: { x: -0.2, z: -0.6 }, width: 1.05 },
@@ -23,7 +23,7 @@ export const LEVELS = [
     timeLimit: 55,
     theme: "wood",
     board: { halfW: 4.8, halfD: 4.8 },
-    ballRadius: 0.11,
+    ballRadius: 0.16,
     fallThreshold: -1.5,
     spawn: { x: 0, z: -3.8 },
     holes: [

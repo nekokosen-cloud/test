@@ -2,135 +2,139 @@ import * as THREE from "three";
 
 const THEMES = {
   wood: {
-    board: 0x9a6537,
-    boardEdge: 0x6f4522,
-    floor: 0xb8824f,
-    wall: 0x5c3a1e,
-    ball: 0xd8dde3,
-    ballSpecular: 0xffffff,
-    hole: 0x120a04,
-    rim: 0x4a2f18,
-    bg: 0x241710,
+    board: 0xc89555,
+    floor: 0xe0b878,
+    wall: 0x6b4226,
+    rim: 0x5a3518,
+    bg: 0x3d2817,
   },
 };
 
 function makeMaterial(color, opts = {}) {
-  return new THREE.MeshStandardMaterial({
-    color,
-    metalness: opts.metalness ?? 0.08,
-    roughness: opts.roughness ?? 0.72,
-    emissive: opts.emissive ?? 0x000000,
-    emissiveIntensity: opts.emissiveIntensity ?? 0,
-  });
+  return new THREE.MeshLambertMaterial({ color, ...opts });
 }
 
 function addBoard(group, level, theme) {
-  const boardW = level.board.halfW * 2 + 0.6;
-  const boardD = level.board.halfD * 2 + 0.6;
-  const thickness = 0.18;
+  const boardW = level.board.halfW * 2 + 0.5;
+  const boardD = level.board.halfD * 2 + 0.5;
+  const thickness = 0.2;
 
   const base = new THREE.Mesh(
     new THREE.BoxGeometry(boardW, thickness, boardD),
     makeMaterial(theme.board)
   );
-  base.position.y = -thickness * 0.5 - 0.04;
+  base.position.y = -thickness * 0.5;
   group.add(base);
 
-  const rimHeight = 0.16;
-  const rimThickness = 0.12;
-  const rimMat = makeMaterial(theme.rim, { roughness: 0.8 });
-  const halfW = level.board.halfW + 0.18;
-  const halfD = level.board.halfD + 0.18;
+  const rimH = 0.18;
+  const rimT = 0.1;
+  const rimMat = makeMaterial(theme.rim);
+  const hw = level.board.halfW + 0.15;
+  const hd = level.board.halfD + 0.15;
 
-  const rims = [
-    [boardW + rimThickness, halfD * 2 + rimThickness * 2, 0, halfD + rimThickness * 0.5],
-    [boardW + rimThickness, halfD * 2 + rimThickness * 2, 0, -halfD - rimThickness * 0.5],
-    [halfW * 2 + rimThickness * 2, rimThickness, halfW + rimThickness * 0.5, 0],
-    [halfW * 2 + rimThickness * 2, rimThickness, -halfW - rimThickness * 0.5, 0],
-  ];
-
-  rims.forEach(([w, d, x, z]) => {
-    const rim = new THREE.Mesh(new THREE.BoxGeometry(w, rimHeight, d), rimMat);
-    rim.position.set(x, rimHeight * 0.5, z);
+  [
+    [boardW + rimT, hd * 2 + rimT * 2, 0, hd + rimT * 0.5],
+    [boardW + rimT, hd * 2 + rimT * 2, 0, -hd - rimT * 0.5],
+    [hw * 2 + rimT * 2, rimT, hw + rimT * 0.5, 0],
+    [hw * 2 + rimT * 2, rimT, -hw - rimT * 0.5, 0],
+  ].forEach(([w, d, x, z]) => {
+    const rim = new THREE.Mesh(new THREE.BoxGeometry(w, rimH, d), rimMat);
+    rim.position.set(x, rimH * 0.5 + 0.02, z);
     group.add(rim);
   });
 }
 
-function addCorridorSegment(group, start, end, width, theme, holes) {
+function addCorridorSegment(group, start, end, width, theme) {
   const dx = end.x - start.x;
   const dz = end.z - start.z;
   const length = Math.hypot(dx, dz);
   if (length < 0.001) return;
 
-  const centerX = (start.x + end.x) * 0.5;
-  const centerZ = (start.z + end.z) * 0.5;
+  const cx = (start.x + end.x) * 0.5;
+  const cz = (start.z + end.z) * 0.5;
   const angle = Math.atan2(dx, dz);
-  const floorThickness = 0.06;
-  const wallHeight = 0.2;
-  const wallThickness = 0.07;
+  const floorH = 0.08;
+  const wallH = 0.22;
+  const wallT = 0.08;
 
-  const floorMat = makeMaterial(theme.floor, { roughness: 0.65 });
-  const floor = new THREE.Mesh(new THREE.BoxGeometry(width, floorThickness, length), floorMat);
-  floor.position.set(centerX, floorThickness * 0.5, centerZ);
+  const floor = new THREE.Mesh(
+    new THREE.BoxGeometry(width, floorH, length),
+    makeMaterial(theme.floor)
+  );
+  floor.position.set(cx, floorH * 0.5, cz);
   floor.rotation.y = angle;
   group.add(floor);
 
-  const wallMat = makeMaterial(theme.wall, { roughness: 0.85 });
   const perpX = -Math.sin(angle);
   const perpZ = Math.cos(angle);
-  const offset = width * 0.5 + wallThickness * 0.5;
+  const off = width * 0.5 + wallT * 0.5;
+  const wallMat = makeMaterial(theme.wall);
 
   for (const side of [-1, 1]) {
     const wall = new THREE.Mesh(
-      new THREE.BoxGeometry(wallThickness, wallHeight, length),
+      new THREE.BoxGeometry(wallT, wallH, length),
       wallMat
     );
-    wall.position.set(
-      centerX + perpX * offset * side,
-      wallHeight * 0.5 + floorThickness,
-      centerZ + perpZ * offset * side
-    );
+    wall.position.set(cx + perpX * off * side, wallH * 0.5 + floorH, cz + perpZ * off * side);
     wall.rotation.y = angle;
     group.add(wall);
   }
 }
 
-function addHole(group, hole, theme) {
-  const depth = 0.4;
+function addHole(group, hole) {
+  const r = hole.radius;
+
+  // 洞口黑圈（一定看得见）
   const pit = new THREE.Mesh(
-    new THREE.CylinderGeometry(hole.radius * 0.95, hole.radius * 0.8, depth, 28),
-    makeMaterial(theme.hole, { roughness: 1, metalness: 0 })
+    new THREE.CylinderGeometry(r * 0.92, r * 0.92, 0.12, 32),
+    new THREE.MeshBasicMaterial({ color: 0x000000 })
   );
-  pit.position.set(hole.x, -depth * 0.5 + 0.01, hole.z);
+  pit.position.set(hole.x, 0.05, hole.z);
   group.add(pit);
 
-  const ringColor = hole.goal === false ? 0x882222 : 0x1a0a00;
+  // 高亮边环
+  const ringColor = hole.goal ? 0x33ff66 : 0xff3333;
   const ring = new THREE.Mesh(
-    new THREE.TorusGeometry(hole.radius, 0.022, 8, 32),
-    makeMaterial(ringColor, { roughness: 0.9 })
+    new THREE.TorusGeometry(r, 0.045, 10, 40),
+    new THREE.MeshBasicMaterial({ color: ringColor })
   );
   ring.rotation.x = Math.PI / 2;
-  ring.position.set(hole.x, 0.058, hole.z);
+  ring.position.set(hole.x, 0.1, hole.z);
   group.add(ring);
 
   if (hole.goal) {
-    const flag = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.015, 0.015, 0.28, 8),
-      makeMaterial(0xcc2222, { roughness: 0.5 })
+    const pole = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.025, 0.025, 0.35, 8),
+      new THREE.MeshBasicMaterial({ color: 0xff2222 })
     );
-    flag.position.set(hole.x + hole.radius * 0.5, 0.2, hole.z);
+    pole.position.set(hole.x + r * 0.55, 0.28, hole.z);
+    group.add(pole);
+
+    const flag = new THREE.Mesh(
+      new THREE.BoxGeometry(0.22, 0.14, 0.02),
+      new THREE.MeshBasicMaterial({ color: 0xffcc00 })
+    );
+    flag.position.set(hole.x + r * 0.7, 0.38, hole.z);
     group.add(flag);
   }
 }
 
 function addStartMark(group, spawn) {
-  const mark = new THREE.Mesh(
-    new THREE.RingGeometry(0.14, 0.2, 24),
-    makeMaterial(0x3fa34d, { roughness: 0.5, metalness: 0.1 })
+  const pad = new THREE.Mesh(
+    new THREE.CircleGeometry(0.22, 28),
+    new THREE.MeshBasicMaterial({ color: 0x33dd55 })
   );
-  mark.rotation.x = -Math.PI / 2;
-  mark.position.set(spawn.x, 0.062, spawn.z);
-  group.add(mark);
+  pad.rotation.x = -Math.PI / 2;
+  pad.position.set(spawn.x, 0.09, spawn.z);
+  group.add(pad);
+
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(0.24, 0.3, 28),
+    new THREE.MeshBasicMaterial({ color: 0xffffff })
+  );
+  ring.rotation.x = -Math.PI / 2;
+  ring.position.set(spawn.x, 0.095, spawn.z);
+  group.add(ring);
 }
 
 export function buildLevelScene(level) {
@@ -138,19 +142,15 @@ export function buildLevelScene(level) {
   const group = new THREE.Group();
 
   addBoard(group, level, theme);
-
-  level.segments.forEach((segment) => {
-    addCorridorSegment(group, segment.from, segment.to, segment.width, theme, level.holes);
-  });
-
-  level.holes.forEach((hole) => addHole(group, hole, theme));
+  level.segments.forEach((seg) => addCorridorSegment(group, seg.from, seg.to, seg.width, theme));
+  level.holes.forEach((hole) => addHole(group, hole));
   addStartMark(group, level.spawn);
 
+  // 亮橙色球 — MeshBasic 不依赖灯光，手机一定可见
   const ball = new THREE.Mesh(
-    new THREE.SphereGeometry(level.ballRadius, 28, 28),
-    makeMaterial(theme.ball, { metalness: 0.95, roughness: 0.12 })
+    new THREE.SphereGeometry(level.ballRadius, 24, 24),
+    new THREE.MeshBasicMaterial({ color: 0xff6600 })
   );
-  ball.castShadow = true;
 
   return { group, ball, theme };
 }
