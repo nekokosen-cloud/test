@@ -1,0 +1,347 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A100000000000001 /* SpaceBallApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000001 /* SpaceBallApp.swift */; };
+		A100000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000002 /* ContentView.swift */; };
+		A100000000000003 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000003 /* GameView.swift */; };
+		A100000000000004 /* HUDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000004 /* HUDView.swift */; };
+		A100000000000005 /* GameSceneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000005 /* GameSceneController.swift */; };
+		A100000000000006 /* LevelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000006 /* LevelManager.swift */; };
+		A100000000000007 /* MotionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000007 /* MotionManager.swift */; };
+		A100000000000008 /* MazeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000008 /* MazeBuilder.swift */; };
+		A100000000000009 /* MaterialFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000009 /* MaterialFactory.swift */; };
+		A100000000000010 /* Level1Space.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000010 /* Level1Space.swift */; };
+		A100000000000011 /* Level2Nebula.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000011 /* Level2Nebula.swift */; };
+		A100000000000012 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000012 /* GameState.swift */; };
+		A100000000000013 /* LevelContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000013 /* LevelContext.swift */; };
+		A100000000000014 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A200000000000014 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A200000000000001 /* SpaceBallApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceBallApp.swift; sourceTree = "<group>"; };
+		A200000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A200000000000003 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
+		A200000000000004 /* HUDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUDView.swift; sourceTree = "<group>"; };
+		A200000000000005 /* GameSceneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSceneController.swift; sourceTree = "<group>"; };
+		A200000000000006 /* LevelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelManager.swift; sourceTree = "<group>"; };
+		A200000000000007 /* MotionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionManager.swift; sourceTree = "<group>"; };
+		A200000000000008 /* MazeBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MazeBuilder.swift; sourceTree = "<group>"; };
+		A200000000000009 /* MaterialFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaterialFactory.swift; sourceTree = "<group>"; };
+		A200000000000010 /* Level1Space.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Level1Space.swift; sourceTree = "<group>"; };
+		A200000000000011 /* Level2Nebula.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Level2Nebula.swift; sourceTree = "<group>"; };
+		A200000000000012 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
+		A200000000000013 /* LevelContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelContext.swift; sourceTree = "<group>"; };
+		A200000000000014 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A200000000000015 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A200000000000016 /* SpaceBall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpaceBall.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A300000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A400000000000001 = {
+			isa = PBXGroup;
+			children = (
+				A400000000000002 /* SpaceBall */,
+				A400000000000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A400000000000002 /* SpaceBall */ = {
+			isa = PBXGroup;
+			children = (
+				A400000000000004 /* App */,
+				A400000000000005 /* Views */,
+				A400000000000006 /* Game */,
+				A400000000000007 /* Levels */,
+				A400000000000008 /* Models */,
+				A400000000000009 /* Resources */,
+				A200000000000015 /* Info.plist */,
+			);
+			path = SpaceBall;
+			sourceTree = "<group>";
+		};
+		A400000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A200000000000016 /* SpaceBall.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A400000000000004 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A200000000000001 /* SpaceBallApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A400000000000005 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A200000000000002 /* ContentView.swift */,
+				A200000000000003 /* GameView.swift */,
+				A200000000000004 /* HUDView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A400000000000006 /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				A200000000000005 /* GameSceneController.swift */,
+				A200000000000006 /* LevelManager.swift */,
+				A200000000000007 /* MotionManager.swift */,
+				A200000000000008 /* MazeBuilder.swift */,
+				A200000000000009 /* MaterialFactory.swift */,
+			);
+			path = Game;
+			sourceTree = "<group>";
+		};
+		A400000000000007 /* Levels */ = {
+			isa = PBXGroup;
+			children = (
+				A200000000000010 /* Level1Space.swift */,
+				A200000000000011 /* Level2Nebula.swift */,
+			);
+			path = Levels;
+			sourceTree = "<group>";
+		};
+		A400000000000008 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A200000000000012 /* GameState.swift */,
+				A200000000000013 /* LevelContext.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A400000000000009 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A200000000000014 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A500000000000001 /* SpaceBall */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A700000000000003 /* Build configuration list for PBXNativeTarget "SpaceBall" */;
+			buildPhases = (
+				A500000000000002 /* Sources */,
+				A300000000000001 /* Frameworks */,
+				A500000000000003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SpaceBall;
+			productName = SpaceBall;
+			productReference = A200000000000016 /* SpaceBall.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A600000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					A500000000000001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = A700000000000001 /* Build configuration list for PBXProject "SpaceBall" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A400000000000001;
+			productRefGroup = A400000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A500000000000001 /* SpaceBall */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A500000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A100000000000014 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A500000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A100000000000001 /* SpaceBallApp.swift in Sources */,
+				A100000000000002 /* ContentView.swift in Sources */,
+				A100000000000003 /* GameView.swift in Sources */,
+				A100000000000004 /* HUDView.swift in Sources */,
+				A100000000000005 /* GameSceneController.swift in Sources */,
+				A100000000000006 /* LevelManager.swift in Sources */,
+				A100000000000007 /* MotionManager.swift in Sources */,
+				A100000000000008 /* MazeBuilder.swift in Sources */,
+				A100000000000009 /* MaterialFactory.swift in Sources */,
+				A100000000000010 /* Level1Space.swift in Sources */,
+				A100000000000011 /* Level2Nebula.swift in Sources */,
+				A100000000000012 /* GameState.swift in Sources */,
+				A100000000000013 /* LevelContext.swift in Sources */,
+			);
+			runOnlyForPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A800000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A800000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A800000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SpaceBall/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.spaceball.prototype;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A800000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SpaceBall/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.spaceball.prototype;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A700000000000001 /* Build configuration list for PBXProject "SpaceBall" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A800000000000001 /* Debug */,
+				A800000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A700000000000003 /* Build configuration list for PBXNativeTarget "SpaceBall" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A800000000000003 /* Debug */,
+				A800000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A600000000000001 /* Project object */;
+}
