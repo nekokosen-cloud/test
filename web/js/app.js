@@ -19,17 +19,19 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x020308);
+scene.background = new THREE.Color(0x241710);
 
-const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(0, 11.5, 0.01);
+const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 8.2, 6.4);
 camera.lookAt(0, 0, 0);
 
-scene.add(new THREE.AmbientLight(0xffffff, 0.28));
-const keyLight = new THREE.DirectionalLight(0xffffff, 1.1);
-keyLight.position.set(4, 10, 6);
-keyLight.castShadow = true;
+scene.add(new THREE.AmbientLight(0xfff2df, 0.55));
+const keyLight = new THREE.DirectionalLight(0xffffff, 1.05);
+keyLight.position.set(5, 11, 7);
 scene.add(keyLight);
+const fillLight = new THREE.DirectionalLight(0xffdcb0, 0.35);
+fillLight.position.set(-4, 6, -3);
+scene.add(fillLight);
 
 const mazeGroup = new THREE.Group();
 scene.add(mazeGroup);
@@ -42,6 +44,11 @@ let phase = "ready";
 let motionEnabled = false;
 let tiltX = 0;
 let tiltZ = 0;
+let targetTiltX = 0;
+let targetTiltZ = 0;
+let baseGamma = 0;
+let baseBeta = 45;
+let calibrated = false;
 let lastFrameTime = performance.now();
 
 function getLevel() {
@@ -50,27 +57,30 @@ function getLevel() {
 
 function loadLevel(index) {
   while (mazeGroup.children.length) mazeGroup.remove(mazeGroup.children[0]);
-  if (ballMesh) {
-    scene.remove(ballMesh);
-    ballMesh = null;
-  }
+  ballMesh = null;
 
   currentLevelIndex = index;
   const level = getLevel();
   const built = buildLevelScene(level);
   mazeGroup.add(built.group);
+
   ballMesh = built.ball;
-  scene.add(ballMesh);
+  mazeGroup.add(ballMesh);
   scene.background = new THREE.Color(built.theme.bg);
 
   ballState = createBallState(level);
   syncBallMesh();
   mazeGroup.rotation.set(0, 0, 0);
+  tiltX = 0;
+  tiltZ = 0;
+  targetTiltX = 0;
+  targetTiltZ = 0;
+  calibrated = false;
 
   elapsed = 0;
   updateTimerDisplay(level.timeLimit);
   levelLabel.textContent = `第 ${level.id} 关 · ${level.name}`;
-  hintEl.textContent = `限时 ${level.timeLimit} 秒 · 掉出轨道即失败`;
+  hintEl.textContent = "平放手机为水平，倾斜托盘让钢球滚进洞口";
 }
 
 function syncBallMesh() {
@@ -112,53 +122,71 @@ async function requestMotionPermission() {
   return true;
 }
 
+function calibrateOrientation(event) {
+  baseGamma = event.gamma ?? 0;
+  baseBeta = event.beta ?? 45;
+  calibrated = true;
+}
+
 function bindMotionListeners() {
-  window.addEventListener("deviceorientation", (event) => {
-    if (!motionEnabled || phase !== "playing") return;
+  window.addEventListener(
+    "deviceorientation",
+    (event) => {
+      if (!motionEnabled) return;
 
-    const gamma = event.gamma ?? 0;
-    const beta = event.beta ?? 0;
-    const maxTilt = 0.42;
+      if (!calibrated) calibrateOrientation(event);
 
-    tiltX = clamp((gamma / 180) * Math.PI * 0.85, -maxTilt, maxTilt);
-    tiltZ = clamp(((beta - 45) / 180) * Math.PI * 0.85, -maxTilt, maxTilt);
+      const maxTilt = 0.32;
+      const gamma = event.gamma ?? 0;
+      const beta = event.beta ?? 45;
 
-    mazeGroup.rotation.x = tiltX;
-    mazeGroup.rotation.z = tiltZ;
-  }, true);
+      targetTiltX = clamp((gamma - baseGamma) * 0.017, -maxTilt, maxTilt);
+      targetTiltZ = clamp((beta - baseBeta) * 0.017, -maxTilt, maxTilt);
+    },
+    true
+  );
 }
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+function updateTilt(dt) {
+  const smooth = 1 - Math.pow(0.001, dt);
+  tiltX += (targetTiltX - tiltX) * smooth;
+  tiltZ += (targetTiltZ - tiltZ) * smooth;
+  mazeGroup.rotation.x = tiltX;
+  mazeGroup.rotation.z = tiltZ;
+}
+
 function startGame() {
   phase = "playing";
   elapsed = 0;
   lastFrameTime = performance.now();
+  calibrated = false;
   resetBall(ballState, getLevel());
   syncBallMesh();
   mazeGroup.rotation.set(0, 0, 0);
+  tiltX = 0;
+  tiltZ = 0;
+  targetTiltX = 0;
+  targetTiltZ = 0;
   hideOverlay();
 }
 
 function winLevel() {
   phase = "won";
   if (navigator.vibrate) navigator.vibrate(80);
-  hintEl.textContent = "虫洞捕获成功！";
+  hintEl.textContent = "进洞！托盘平衡成功。";
 
   const hasNext = currentLevelIndex + 1 < LEVELS.length;
   showOverlay({
     title: "过关！",
-    message: "你成功把能量球送入了虫洞。",
+    message: "钢球稳稳滚进了目标洞口。",
     primaryText: hasNext ? "下一关" : "再玩一次",
     secondaryText: "重试",
     onPrimary: () => {
-      if (hasNext) {
-        loadLevel(currentLevelIndex + 1);
-      } else {
-        loadLevel(0);
-      }
+      loadLevel(hasNext ? currentLevelIndex + 1 : 0);
       startGame();
     },
     onSecondary: () => {
@@ -190,6 +218,10 @@ function tick(now) {
   const dt = Math.min(0.033, (now - lastFrameTime) / 1000);
   lastFrameTime = now;
 
+  if (phase === "playing") {
+    updateTilt(dt);
+  }
+
   if (phase === "playing" && ballState) {
     elapsed += dt;
     const level = getLevel();
@@ -209,7 +241,7 @@ function tick(now) {
       return;
     }
     if (result.fellOut) {
-      loseLevel("坠出轨道");
+      loseLevel(result.trapHole ? "掉进陷阱洞" : "钢球掉出托盘");
     }
   }
 
@@ -219,14 +251,14 @@ function tick(now) {
 function showStartScreen() {
   phase = "ready";
   showOverlay({
-    title: "Space Ball",
-    message: "固定俯视 3D 迷宫。倾斜 iPhone 控制重力，限时内滚进发光虫洞。",
+    title: "平衡球",
+    message: "经典 Teeter 玩法：整盘迷宫随手机倾斜，把钢球滚进目标洞口。开局时保持手机水平作为基准。",
     primaryText: motionEnabled ? "开始游戏" : "授权并开始",
     onPrimary: async () => {
       if (!motionEnabled) {
         const granted = await requestMotionPermission();
         if (!granted) {
-          overlayMessage.textContent = "需要「动作与方向」权限才能倾斜控制。请到 Safari 设置中允许后重试。";
+          overlayMessage.textContent = "需要「动作与方向」权限才能倾斜托盘。请到 Safari 设置中允许后重试。";
           return;
         }
         motionEnabled = true;

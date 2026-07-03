@@ -1,43 +1,62 @@
 import * as THREE from "three";
 
 const THEMES = {
-  space: {
-    floor: 0x1a2230,
-    floorEmissive: 0x0a1a33,
-    wall: 0x2d8cf2,
-    wallEmissive: 0x0a3366,
-    ball: 0xf5fbff,
-    ballEmissive: 0x3399ff,
-    hole: 0x33f0ff,
-    bg: 0x020308,
-    pad: 0x22cc77,
-  },
-  nebula: {
-    floor: 0x2a1238,
-    floorEmissive: 0x330855,
-    wall: 0xbf40f2,
-    wallEmissive: 0x550866,
-    ball: 0xffe8fa,
-    ballEmissive: 0xff66dd,
-    hole: 0xff66ee,
-    bg: 0x08010f,
-    pad: 0xff66ee,
+  wood: {
+    board: 0x9a6537,
+    boardEdge: 0x6f4522,
+    floor: 0xb8824f,
+    wall: 0x5c3a1e,
+    ball: 0xd8dde3,
+    ballSpecular: 0xffffff,
+    hole: 0x120a04,
+    rim: 0x4a2f18,
+    bg: 0x241710,
   },
 };
 
-function makePBRMaterial(color, emissive, opts = {}) {
+function makeMaterial(color, opts = {}) {
   return new THREE.MeshStandardMaterial({
     color,
-    emissive,
-    emissiveIntensity: opts.emissiveIntensity ?? 0.45,
-    metalness: opts.metalness ?? 0.75,
-    roughness: opts.roughness ?? 0.35,
-    transparent: opts.transparent ?? false,
-    opacity: opts.opacity ?? 1,
+    metalness: opts.metalness ?? 0.08,
+    roughness: opts.roughness ?? 0.72,
+    emissive: opts.emissive ?? 0x000000,
+    emissiveIntensity: opts.emissiveIntensity ?? 0,
   });
 }
 
-function addCorridorSegment(group, start, end, width, wallHeight, floorThickness, theme) {
+function addBoard(group, level, theme) {
+  const boardW = level.board.halfW * 2 + 0.6;
+  const boardD = level.board.halfD * 2 + 0.6;
+  const thickness = 0.18;
+
+  const base = new THREE.Mesh(
+    new THREE.BoxGeometry(boardW, thickness, boardD),
+    makeMaterial(theme.board)
+  );
+  base.position.y = -thickness * 0.5 - 0.04;
+  group.add(base);
+
+  const rimHeight = 0.16;
+  const rimThickness = 0.12;
+  const rimMat = makeMaterial(theme.rim, { roughness: 0.8 });
+  const halfW = level.board.halfW + 0.18;
+  const halfD = level.board.halfD + 0.18;
+
+  const rims = [
+    [boardW + rimThickness, halfD * 2 + rimThickness * 2, 0, halfD + rimThickness * 0.5],
+    [boardW + rimThickness, halfD * 2 + rimThickness * 2, 0, -halfD - rimThickness * 0.5],
+    [halfW * 2 + rimThickness * 2, rimThickness, halfW + rimThickness * 0.5, 0],
+    [halfW * 2 + rimThickness * 2, rimThickness, -halfW - rimThickness * 0.5, 0],
+  ];
+
+  rims.forEach(([w, d, x, z]) => {
+    const rim = new THREE.Mesh(new THREE.BoxGeometry(w, rimHeight, d), rimMat);
+    rim.position.set(x, rimHeight * 0.5, z);
+    group.add(rim);
+  });
+}
+
+function addCorridorSegment(group, start, end, width, theme, holes) {
   const dx = end.x - start.x;
   const dz = end.z - start.z;
   const length = Math.hypot(dx, dz);
@@ -46,26 +65,29 @@ function addCorridorSegment(group, start, end, width, wallHeight, floorThickness
   const centerX = (start.x + end.x) * 0.5;
   const centerZ = (start.z + end.z) * 0.5;
   const angle = Math.atan2(dx, dz);
+  const floorThickness = 0.06;
+  const wallHeight = 0.2;
+  const wallThickness = 0.07;
 
-  const floorGeo = new THREE.BoxGeometry(width, floorThickness, length);
-  const floorMat = makePBRMaterial(theme.floor, theme.floorEmissive);
-  const floor = new THREE.Mesh(floorGeo, floorMat);
-  floor.position.set(centerX, -floorThickness * 0.5, centerZ);
+  const floorMat = makeMaterial(theme.floor, { roughness: 0.65 });
+  const floor = new THREE.Mesh(new THREE.BoxGeometry(width, floorThickness, length), floorMat);
+  floor.position.set(centerX, floorThickness * 0.5, centerZ);
   floor.rotation.y = angle;
   group.add(floor);
 
-  const wallThickness = 0.08;
-  const wallMat = makePBRMaterial(theme.wall, theme.wallEmissive, { metalness: 0.9, roughness: 0.2 });
+  const wallMat = makeMaterial(theme.wall, { roughness: 0.85 });
   const perpX = -Math.sin(angle);
   const perpZ = Math.cos(angle);
   const offset = width * 0.5 + wallThickness * 0.5;
 
   for (const side of [-1, 1]) {
-    const wallGeo = new THREE.BoxGeometry(wallThickness, wallHeight, length);
-    const wall = new THREE.Mesh(wallGeo, wallMat);
+    const wall = new THREE.Mesh(
+      new THREE.BoxGeometry(wallThickness, wallHeight, length),
+      wallMat
+    );
     wall.position.set(
       centerX + perpX * offset * side,
-      wallHeight * 0.5,
+      wallHeight * 0.5 + floorThickness,
       centerZ + perpZ * offset * side
     );
     wall.rotation.y = angle;
@@ -74,69 +96,50 @@ function addCorridorSegment(group, start, end, width, wallHeight, floorThickness
 }
 
 function addHole(group, hole, theme) {
-  const ringGeo = new THREE.TorusGeometry(hole.radius, 0.04, 12, 48);
-  const ringMat = makePBRMaterial(theme.hole, theme.hole, { emissiveIntensity: 1, metalness: 1, roughness: 0.15 });
-  const ring = new THREE.Mesh(ringGeo, ringMat);
+  const depth = 0.35;
+  const pit = new THREE.Mesh(
+    new THREE.CylinderGeometry(hole.radius * 0.92, hole.radius * 0.75, depth, 28),
+    makeMaterial(theme.hole, { roughness: 1, metalness: 0 })
+  );
+  pit.position.set(hole.x, -depth * 0.5 + 0.02, hole.z);
+  group.add(pit);
+
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(hole.radius, 0.018, 8, 32),
+    makeMaterial(hole.goal === false ? 0x661111 : 0x2d1808, { roughness: 0.9 })
+  );
   ring.rotation.x = Math.PI / 2;
-  ring.position.set(hole.x, 0.02, hole.z);
+  ring.position.set(hole.x, 0.055, hole.z);
   group.add(ring);
-
-  const glowGeo = new THREE.CylinderGeometry(hole.radius * 0.85, hole.radius * 0.85, 0.02, 32);
-  const glowMat = makePBRMaterial(theme.hole, theme.hole, {
-    emissiveIntensity: 0.9,
-    transparent: true,
-    opacity: 0.65,
-    metalness: 0.2,
-    roughness: 0.5,
-  });
-  const glow = new THREE.Mesh(glowGeo, glowMat);
-  glow.position.set(hole.x, -0.01, hole.z);
-  group.add(glow);
-
-  const light = new THREE.PointLight(theme.hole, 2.2, 4);
-  light.position.set(hole.x, 1.2, hole.z);
-  group.add(light);
 }
 
-function addStartPad(group, spawn, theme) {
-  const padGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.03, 24);
-  const padMat = makePBRMaterial(theme.pad, theme.pad, { emissiveIntensity: 0.7, metalness: 0.2, roughness: 0.4 });
-  const pad = new THREE.Mesh(padGeo, padMat);
-  pad.position.set(spawn.x, 0.02, spawn.z);
-  group.add(pad);
-}
-
-function addStars(group) {
-  const count = 120;
-  const positions = new Float32Array(count * 3);
-  for (let i = 0; i < count; i += 1) {
-    positions[i * 3] = (Math.random() - 0.5) * 24;
-    positions[i * 3 + 1] = 4 + Math.random() * 8;
-    positions[i * 3 + 2] = (Math.random() - 0.5) * 24;
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-  const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.05, transparent: true, opacity: 0.85 });
-  group.add(new THREE.Points(geo, mat));
+function addStartMark(group, spawn) {
+  const mark = new THREE.Mesh(
+    new THREE.RingGeometry(0.14, 0.2, 24),
+    makeMaterial(0x3fa34d, { roughness: 0.5, metalness: 0.1 })
+  );
+  mark.rotation.x = -Math.PI / 2;
+  mark.position.set(spawn.x, 0.062, spawn.z);
+  group.add(mark);
 }
 
 export function buildLevelScene(level) {
-  const theme = THEMES[level.theme] ?? THEMES.space;
+  const theme = THEMES[level.theme] ?? THEMES.wood;
   const group = new THREE.Group();
 
+  addBoard(group, level, theme);
+
   level.segments.forEach((segment) => {
-    addCorridorSegment(group, segment.from, segment.to, segment.width, 0.28, 0.12, theme);
+    addCorridorSegment(group, segment.from, segment.to, segment.width, theme, level.holes);
   });
 
-  addHole(group, level.hole, theme);
-  if (level.theme === "space") {
-    addStartPad(group, level.spawn, theme);
-    addStars(group);
-  }
+  level.holes.forEach((hole) => addHole(group, hole, theme));
+  addStartMark(group, level.spawn);
 
-  const ballGeo = new THREE.SphereGeometry(level.ballRadius, 32, 32);
-  const ballMat = makePBRMaterial(theme.ball, theme.ballEmissive, { emissiveIntensity: 0.8, metalness: 0.95, roughness: 0.08 });
-  const ball = new THREE.Mesh(ballGeo, ballMat);
+  const ball = new THREE.Mesh(
+    new THREE.SphereGeometry(level.ballRadius, 28, 28),
+    makeMaterial(theme.ball, { metalness: 0.95, roughness: 0.12 })
+  );
   ball.castShadow = true;
 
   return { group, ball, theme };
