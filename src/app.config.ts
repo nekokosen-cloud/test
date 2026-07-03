@@ -2,6 +2,7 @@ export default defineAppConfig({
   pages: [
     'pages/fishing/index',
     'pages/encyclopedia/index',
+    'pages/koi/index',
   ],
   window: {
     backgroundTextStyle: 'light',

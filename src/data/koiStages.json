@@ -1,0 +1,39 @@
+[
+  {
+    "stage": 0,
+    "name": "鱼卵/幼鲤",
+    "sizePx": 28,
+    "minAgeHours": 0,
+    "minFeedCount": 0
+  },
+  {
+    "stage": 1,
+    "name": "小锦鲤",
+    "sizePx": 40,
+    "minAgeHours": 2,
+    "minFeedCount": 3
+  },
+  {
+    "stage": 2,
+    "name": "中锦鲤",
+    "sizePx": 56,
+    "minAgeHours": 12,
+    "minFeedCount": 10
+  },
+  {
+    "stage": 3,
+    "name": "大锦鲤",
+    "sizePx": 72,
+    "minAgeHours": 48,
+    "minFeedCount": 20,
+    "requiresGoodCare": true
+  },
+  {
+    "stage": 4,
+    "name": "传说锦鲤",
+    "sizePx": 88,
+    "minAgeHours": 168,
+    "minFeedCount": 30,
+    "requiresNeverDanger": true
+  }
+]

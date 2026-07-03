@@ -16,6 +16,20 @@ export function vibrateBite(): void {
   }
 }
 
+export function vibratePet(): void {
+  try {
+    if (process.env.TARO_ENV === 'weapp') {
+      Taro.vibrateShort({ type: 'light' });
+      return;
+    }
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      navigator.vibrate(20);
+    }
+  } catch {
+    // vibration not supported
+  }
+}
+
 export function vibrateReel(): void {
   try {
     if (process.env.TARO_ENV === 'weapp') {

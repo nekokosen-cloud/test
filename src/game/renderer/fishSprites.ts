@@ -85,6 +85,21 @@ const FISH_DRAWERS: Record<string, (s: SpriteCtx) => void> = {
     P(s, 13, 5, 1, 1, '#FFFFFF');
     P(s, 13, 5, 1, 1, s.outline);
   },
+  common_koi: (s) => {
+    P(s, 4, 4, 8, 5, '#FFFFFF');
+    P(s, 3, 5, 1, 2, s.a);
+    P(s, 2, 4, 1, 1, s.a);
+    P(s, 2, 7, 1, 1, s.a);
+    P(s, 12, 5, 2, 2, s.a);
+    if (!s.silhouette) {
+      P(s, 6, 5, 2, 1, '#E74C3C');
+      P(s, 8, 6, 2, 1, '#C0392B');
+      P(s, 5, 7, 2, 1, '#E74C3C');
+      P(s, 10, 5, 1, 1, '#E74C3C');
+    }
+    P(s, 13, 5, 1, 1, '#FFFFFF');
+    P(s, 13, 5, 1, 1, s.outline);
+  },
   catfish: (s) => {
     P(s, 4, 5, 8, 3);
     P(s, 5, 4, 6, 1);
