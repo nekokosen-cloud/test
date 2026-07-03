@@ -14,6 +14,8 @@ import {
   updateKoiParticles,
 } from '@/game/koi/koiRenderer';
 
+const FEED_ANIM_FRAMES = 90;
+
 interface KoiPondCanvasProps {
   width: number;
   height: number;
@@ -41,36 +43,32 @@ export default function KoiPondCanvas({
   const prevPetTrigger = useRef(petTrigger);
   const bubbleTimerRef = useRef(0);
 
+  const makeDrawParams = (frame: number) => ({
+    koi,
+    width,
+    height,
+    frame,
+    petBurst: petBurstRef.current,
+    feedBurst: feedBurstRef.current,
+  });
+
   useEffect(() => {
     if (feedTrigger !== prevFeedTrigger.current) {
       prevFeedTrigger.current = feedTrigger;
-      feedBurstRef.current = 20;
-      const pos = getKoiPosition({
-        koi,
-        width,
-        height,
-        waterY: Math.floor(height * 0.22),
-        frame: frameRef.current,
-        petBurst: 0,
-        feedBurst: 0,
-      });
-      particlesRef.current = [...particlesRef.current, ...spawnFoodParticles(pos.x, pos.y)];
+      feedBurstRef.current = FEED_ANIM_FRAMES;
+      const pos = getKoiPosition(makeDrawParams(frameRef.current));
+      particlesRef.current = [
+        ...particlesRef.current,
+        ...spawnFoodParticles(pos.x, pos.y, pos.angle),
+      ];
     }
   }, [feedTrigger, koi, width, height]);
 
   useEffect(() => {
     if (petTrigger !== prevPetTrigger.current) {
       prevPetTrigger.current = petTrigger;
-      petBurstRef.current = 30;
-      const pos = getKoiPosition({
-        koi,
-        width,
-        height,
-        waterY: Math.floor(height * 0.22),
-        frame: frameRef.current,
-        petBurst: 0,
-        feedBurst: 0,
-      });
+      petBurstRef.current = 40;
+      const pos = getKoiPosition(makeDrawParams(frameRef.current));
       particlesRef.current = [...particlesRef.current, ...spawnHeartParticles(pos.x, pos.y)];
     }
   }, [petTrigger, koi, width, height]);
@@ -91,33 +89,14 @@ export default function KoiPondCanvas({
     particlesRef.current = updateKoiParticles(particlesRef.current);
 
     bubbleTimerRef.current += 1;
-    if (koi.isAlive && (koi.hunger >= 70 || koi.happiness >= 75) && bubbleTimerRef.current % 90 === 0) {
-      const pos = getKoiPosition({
-        koi,
-        width,
-        height,
-        waterY: Math.floor(height * 0.22),
-        frame,
-        petBurst: petBurstRef.current,
-        feedBurst: feedBurstRef.current,
-      });
+    if (koi.isAlive && (koi.hunger >= 70 || koi.happiness >= 75) && bubbleTimerRef.current % 120 === 0) {
+      const pos = getKoiPosition(makeDrawParams(frame));
       particlesRef.current = [...particlesRef.current, spawnBubbleParticle(pos.x, pos.y)];
     }
 
     ctx.clearRect(0, 0, width, height);
-    const waterY = drawPondBackground(ctx, width, height, frame);
-
-    const drawParams = {
-      koi,
-      width,
-      height,
-      waterY,
-      frame,
-      petBurst: petBurstRef.current,
-      feedBurst: feedBurstRef.current,
-    };
-
-    drawKoi(ctx, drawParams);
+    drawPondBackground(ctx, width, height, frame);
+    drawKoi(ctx, makeDrawParams(frame));
     drawKoiParticles(ctx, particlesRef.current);
   }, [width, height, koi]);
 
@@ -148,17 +127,7 @@ export default function KoiPondCanvas({
     const tapX = (clientX - rect.left) * scaleX;
     const tapY = (clientY - rect.top) * scaleY;
 
-    const drawParams = {
-      koi,
-      width,
-      height,
-      waterY: Math.floor(height * 0.22),
-      frame: frameRef.current,
-      petBurst: petBurstRef.current,
-      feedBurst: feedBurstRef.current,
-    };
-
-    if (isTapOnKoi(tapX, tapY, drawParams)) {
+    if (isTapOnKoi(tapX, tapY, makeDrawParams(frameRef.current))) {
       onPet();
     }
   };
