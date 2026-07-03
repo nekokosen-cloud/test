@@ -10,14 +10,11 @@
 - 鱼种图鉴收集系统（本地存档）
 - 像素风 Canvas 渲染
 
-## 快速开始
+## 在线体验（手机直接打开）
 
-```bash
-npm install
-npm run dev:h5
-```
+**H5 地址：** https://nekokosen-cloud.github.io/test/
 
-浏览器访问 http://localhost:10086
+iPhone Safari 直接打开上面的链接即可，无需开电脑。
 
 ## 微信小程序
 
