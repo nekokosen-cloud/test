@@ -155,9 +155,14 @@
   }
 
   &__fish-icon {
-    width: 64px;
-    height: 48px;
+    width: 96px;
+    height: 96px;
     border: 3px solid #3E2731;
+    box-shadow: 3px 3px 0 #3E2731;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #8EC8D8;
     image-rendering: pixelated;
   }
 

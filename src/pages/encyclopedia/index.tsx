@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { View, Text } from '@tarojs/components';
 import Taro from '@tarojs/taro';
+import FishSprite from '@/components/FishSprite';
 import { PixelButton, PixelPanel, PixelTag, RarityStars } from '@/components/PixelUI';
 import { usePlayerStore } from '@/stores/playerStore';
 import { getAllFish, getRarityLabel, getRarityStars } from '@/systems/dropTable';
+import { getRarityBorderColor } from '@/game/renderer/fishSprites';
 import { getWeatherIcon } from '@/systems/weather';
-import type { Fish } from '@/types';
+import type { Fish, FishRarity } from '@/types';
 import environmentsData from '@/data/environments.json';
 import weatherData from '@/data/weather.json';
 import './index.scss';
@@ -14,12 +16,33 @@ const allFish = getAllFish();
 const environments = environmentsData as import('@/types').Environment[];
 const weathers = weatherData as import('@/types').Weather[];
 
+const RARITY_ORDER: Record<FishRarity, number> = {
+  legendary: 0,
+  epic: 1,
+  rare: 2,
+  uncommon: 3,
+  common: 4,
+};
+
+type FilterMode = 'all' | 'caught' | 'uncaught';
+
 export default function EncyclopediaPage() {
   const { isDiscovered, getCaughtCount, getDiscoveredCount, save } = usePlayerStore();
   const [selectedFish, setSelectedFish] = useState<Fish | null>(null);
+  const [filter, setFilter] = useState<FilterMode>('all');
 
   const discoveredCount = getDiscoveredCount();
   const totalCount = allFish.length;
+
+  const filteredFish = useMemo(() => {
+    let list = [...allFish];
+    if (filter === 'caught') list = list.filter((f) => isDiscovered(f.id));
+    if (filter === 'uncaught') list = list.filter((f) => !isDiscovered(f.id));
+    return list.sort((a, b) => {
+      const rd = RARITY_ORDER[a.rarity] - RARITY_ORDER[b.rarity];
+      return rd !== 0 ? rd : a.name.localeCompare(b.name, 'zh-CN');
+    });
+  }, [filter, save.caughtFish]);
 
   function goBack() {
     Taro.navigateBack();
@@ -52,37 +75,63 @@ export default function EncyclopediaPage() {
         />
       </View>
 
+      <View className="encyclopedia-page__filters">
+        {([
+          ['all', '全部'],
+          ['caught', '已收集'],
+          ['uncaught', '未收集'],
+        ] as [FilterMode, string][]).map(([key, label]) => (
+          <View
+            key={key}
+            className={`encyclopedia-page__filter ${filter === key ? 'encyclopedia-page__filter--active' : ''}`}
+            onClick={() => setFilter(key)}
+          >
+            <Text className="encyclopedia-page__filter-text">{label}</Text>
+          </View>
+        ))}
+      </View>
+
       <View className="encyclopedia-page__grid">
-        {allFish.map((fish) => {
+        {filteredFish.map((fish) => {
           const discovered = isDiscovered(fish.id);
           const count = getCaughtCount(fish.id);
+          const borderColor = getRarityBorderColor(fish.rarity);
           return (
             <View
               key={fish.id}
               className={`encyclopedia-page__cell ${discovered ? '' : 'encyclopedia-page__cell--locked'}`}
+              style={{ borderColor: discovered ? borderColor : undefined }}
               onClick={() => discovered && setSelectedFish(fish)}
             >
-              <View
-                className="encyclopedia-page__fish-sprite"
-                style={{
-                  backgroundColor: discovered ? fish.color : '#444',
-                  opacity: discovered ? 1 : 0.4,
-                }}
-              >
-                {!discovered && (
-                  <Text className="encyclopedia-page__fish-unknown">?</Text>
+              <View className="encyclopedia-page__sprite-wrap">
+                {discovered ? (
+                  <FishSprite fish={fish} size={56} />
+                ) : (
+                  <View className="encyclopedia-page__sprite-locked">
+                    <FishSprite fish={fish} size={56} silhouette />
+                    <Text className="encyclopedia-page__fish-unknown">?</Text>
+                  </View>
                 )}
               </View>
               <Text className="encyclopedia-page__fish-name">
                 {discovered ? fish.name : '???'}
               </Text>
-              {discovered && count > 0 && (
-                <Text className="encyclopedia-page__fish-count">×{count}</Text>
+              {discovered && (
+                <View className="encyclopedia-page__meta">
+                  <RarityStars count={getRarityStars(fish.rarity)} />
+                  {count > 0 && (
+                    <Text className="encyclopedia-page__fish-count">×{count}</Text>
+                  )}
+                </View>
               )}
             </View>
           );
         })}
       </View>
+
+      {filteredFish.length === 0 && (
+        <Text className="encyclopedia-page__empty">暂无符合条件的鱼种</Text>
+      )}
 
       {selectedFish && (
         <View className="fish-detail" onClick={() => setSelectedFish(null)}>
@@ -90,9 +139,11 @@ export default function EncyclopediaPage() {
             <PixelPanel title={selectedFish.name}>
               <View className="fish-detail__body">
                 <View
-                  className="fish-detail__sprite"
-                  style={{ backgroundColor: selectedFish.color }}
-                />
+                  className="fish-detail__sprite-frame"
+                  style={{ borderColor: getRarityBorderColor(selectedFish.rarity) }}
+                >
+                  <FishSprite fish={selectedFish} size={96} />
+                </View>
                 <RarityStars count={getRarityStars(selectedFish.rarity)} />
                 <Text className="fish-detail__rarity">
                   {getRarityLabel(selectedFish.rarity)}

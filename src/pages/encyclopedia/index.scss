@@ -1,7 +1,7 @@
 .encyclopedia-page {
   min-height: 100vh;
   background: #2A4A3A;
-  padding-bottom: 20px;
+  padding-bottom: 24px;
 
   &__header {
     display: flex;
@@ -9,10 +9,6 @@
     justify-content: space-between;
     padding: 12px 16px;
     background: #3E2731;
-  }
-
-  &__back {
-    cursor: pointer;
   }
 
   &__back-text {
@@ -46,53 +42,100 @@
     transition: width 0.3s;
   }
 
+  &__filters {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px 4px;
+    max-width: 375px;
+    margin: 0 auto;
+  }
+
+  &__filter {
+    flex: 1;
+    padding: 6px 0;
+    text-align: center;
+    background: #1A2A20;
+    border: 2px solid #3E2731;
+
+    &--active {
+      background: #E8A838;
+      border-color: #3E2731;
+
+      .encyclopedia-page__filter-text {
+        color: #3E2731;
+        font-weight: bold;
+      }
+    }
+  }
+
+  &__filter-text {
+    font-size: 12px;
+    color: #AAA;
+    font-family: 'Courier New', monospace;
+  }
+
   &__grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    padding: 16px;
+    gap: 10px;
+    padding: 12px 16px;
     max-width: 375px;
     margin: 0 auto;
   }
 
   &__cell {
     background: #FFF8E7;
-    border: 2px solid #3E2731;
-    padding: 8px;
+    border: 3px solid #3E2731;
+    box-shadow: 2px 2px 0 #3E2731;
+    padding: 8px 4px;
     display: flex;
     flex-direction: column;
     align-items: center;
     cursor: pointer;
 
     &:active {
-      background: #F0E8D0;
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0 #3E2731;
     }
 
     &--locked {
-      background: #333;
+      background: #2A2A32;
       border-color: #555;
+      box-shadow: 2px 2px 0 #222;
       cursor: default;
 
       &:active {
-        background: #333;
+        transform: none;
+        box-shadow: 2px 2px 0 #222;
       }
     }
   }
 
-  &__fish-sprite {
-    width: 48px;
-    height: 36px;
-    border: 2px solid #3E2731;
+  &__sprite-wrap {
+    width: 56px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: center;
     image-rendering: pixelated;
   }
 
+  &__sprite-locked {
+    position: relative;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+  }
+
   &__fish-unknown {
-    font-size: 20px;
+    position: absolute;
+    font-size: 22px;
     font-weight: bold;
     color: #888;
+    text-shadow: 1px 1px 0 #000;
   }
 
   &__fish-name {
@@ -101,16 +144,32 @@
     margin-top: 4px;
     font-family: 'Courier New', monospace;
     text-align: center;
+    line-height: 1.2;
   }
 
   &__cell--locked &__fish-name {
     color: #888;
   }
 
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+  }
+
   &__fish-count {
     font-size: 10px;
     color: #888;
-    margin-top: 2px;
+  }
+
+  &__empty {
+    display: block;
+    text-align: center;
+    color: #AAA;
+    font-size: 13px;
+    padding: 24px;
+    font-family: 'Courier New', monospace;
   }
 }
 
@@ -139,10 +198,11 @@
     padding: 8px 0;
   }
 
-  &__sprite {
-    width: 80px;
-    height: 60px;
+  &__sprite-frame {
+    padding: 8px;
     border: 3px solid #3E2731;
+    box-shadow: 3px 3px 0 #3E2731;
+    background: #8EC8D8;
     image-rendering: pixelated;
   }
 

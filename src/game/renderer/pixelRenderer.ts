@@ -1,4 +1,5 @@
 import type { Environment, Fish, Particle, Weather, WeatherId } from '@/types';
+import { drawFishPixelArt } from '@/game/renderer/fishSprites';
 
 const PIXEL = 4;
 
@@ -21,27 +22,11 @@ export function drawFishSprite(
   fish: Fish,
   scale = 1,
 ): void {
-  const s = PIXEL * scale;
-  const { color, accentColor } = fish;
-
-  // body
-  drawPixelRect(ctx, x, y + s, s * 5, s * 2, color);
-  drawPixelRect(ctx, x + s, y, s * 3, s, color);
-  drawPixelRect(ctx, x + s, y + s * 3, s * 3, s, color);
-  // tail
-  drawPixelRect(ctx, x - s, y + s, s, s * 2, accentColor);
-  drawPixelRect(ctx, x - s * 2, y + s * 0.5, s, s, accentColor);
-  // eye
-  drawPixelRect(ctx, x + s * 4, y + s * 0.5, s * 0.8, s * 0.8, '#FFFFFF');
-  drawPixelRect(ctx, x + s * 4.2, y + s * 0.6, s * 0.4, s * 0.4, '#1A1A2E');
-  // fin
-  drawPixelRect(ctx, x + s * 2, y + s * 3, s, s, accentColor);
-
-  if (fish.rarity === 'legendary' || fish.rarity === 'epic') {
-    ctx.globalAlpha = 0.3;
-    drawPixelRect(ctx, x - s, y, s * 7, s * 4, '#FFFFFF');
-    ctx.globalAlpha = 1;
-  }
+  const size = Math.floor(PIXEL * 4 * scale);
+  ctx.save();
+  ctx.translate(x, y);
+  drawFishPixelArt(ctx, fish, size, { silhouette: false, showBackground: false });
+  ctx.restore();
 }
 
 export function drawBobber(

@@ -2,11 +2,13 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import PixelCanvas from '@/components/PixelCanvas';
+import FishSprite from '@/components/FishSprite';
 import { PixelButton, PixelPanel, PixelTag, RarityStars } from '@/components/PixelUI';
 import { FishingFSM } from '@/game/fsm/fishingFSM';
 import { usePlayerStore } from '@/stores/playerStore';
 import { vibrateBite, vibrateReel } from '@/systems/vibration';
 import { getRarityStars, getRarityLabel } from '@/systems/dropTable';
+import { getRarityBorderColor } from '@/game/renderer/fishSprites';
 import { getWeatherIcon } from '@/systems/weather';
 import type { Environment, EnvironmentId, Fish, FishingState, WeatherId } from '@/types';
 import environmentsData from '@/data/environments.json';
@@ -201,8 +203,10 @@ export default function FishingPage() {
               <View className="catch-modal__fish">
                 <View
                   className="catch-modal__fish-icon"
-                  style={{ backgroundColor: caughtFish.color }}
-                />
+                  style={{ borderColor: getRarityBorderColor(caughtFish.rarity) }}
+                >
+                  <FishSprite fish={caughtFish} size={80} />
+                </View>
                 <Text className="catch-modal__fish-name">{caughtFish.name}</Text>
                 <RarityStars count={getRarityStars(caughtFish.rarity)} />
                 <Text className="catch-modal__fish-rarity">{getRarityLabel(caughtFish.rarity)}</Text>
