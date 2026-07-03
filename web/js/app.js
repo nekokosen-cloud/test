@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import { LEVELS } from "./levels.js";
-import { buildLevelScene } from "./maze.js";
-import { createBallState, resetBall, stepBall } from "./physics.js";
+import { LEVELS } from "./levels.js?v=20260703";
+import { buildLevelScene } from "./maze.js?v=20260703";
+import { createBallState, resetBall, stepBall } from "./physics.js?v=20260703";
 
 const canvas = document.getElementById("game-canvas");
 const levelLabel = document.getElementById("level-label");

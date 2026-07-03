@@ -85,6 +85,12 @@ body {
   opacity: 0.8;
 }
 
+.version-tag {
+  margin-top: 6px;
+  font-size: 0.7rem;
+  opacity: 0.45;
+}
+
 .overlay {
   position: absolute;
   inset: 0;
