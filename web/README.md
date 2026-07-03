@@ -9,29 +9,27 @@
 3. **倾斜手机** 控制小球滚进虫洞
 4. 限时内进洞过关，掉出轨道或超时失败
 
-## 本地预览
+## 立即开玩（已部署）
 
-需要 **HTTPS 或 localhost**，否则 iOS 不会开放陀螺仪权限。
+iPhone **Safari** 直接打开：
 
-```bash
-cd web
-python3 -m http.server 8080
-```
+**https://cdn.jsdelivr.net/gh/nekokosen-cloud/test@main/web/index.html**
 
-同一 Wi‑Fi 下，iPhone Safari 打开：
+1. 点击 **「授权并开始」**
+2. 允许 **「动作与方向」** 传感器
+3. 倾斜手机，把球滚进虫洞
 
-```
-http://<你的电脑IP>:8080
-```
+> 这是通过 jsDelivr CDN 从 GitHub 自动发布的 HTTPS 版本，推送 `main` 分支后约 1 分钟生效。
 
-> 局域网 HTTP 下 iOS 可能仍拒绝传感器。更稳妥的方式是用 GitHub Pages（HTTPS）。
+## GitHub Pages（可选，需仓库主手动开启一次）
 
-## GitHub Pages 部署
+若希望使用更短的域名 `https://nekokosen-cloud.github.io/test/`：
 
-1. 仓库 **Settings → Pages**
-2. Source 选 **Deploy from a branch**
-3. Branch 选 `main`，目录选 **`/web`**
-4. 保存后访问：`https://<用户名>.github.io/<仓库名>/`
+1. GitHub 仓库 → **Settings → Pages**
+2. **Build and deployment** → Source 选 **GitHub Actions**
+3. 保存后 Actions 会自动部署
+
+当前 Actions 因仓库 Pages 未开启而暂时失败，**不影响上面的 CDN 链接**。
 
 ## 技术
 
