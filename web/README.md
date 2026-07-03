@@ -2,6 +2,8 @@
 
 在 iPhone Safari 中直接玩的 3D 重力滚球迷宫原型。
 
+> 在线地址：https://nekokosen-cloud.github.io/test/
+
 ## 玩法
 
 1. 用 **Safari** 打开游戏页面
