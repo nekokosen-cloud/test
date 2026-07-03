@@ -1,0 +1,201 @@
+.fishing-page {
+  min-height: 100vh;
+  background: #2A4A3A;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 20px;
+
+  &__header {
+    width: 100%;
+    max-width: 375px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #3E2731;
+  }
+
+  &__env-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__env-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #E8A838;
+    font-family: 'Courier New', monospace;
+  }
+
+  &__weather {
+    font-size: 13px;
+    color: #FFF8E7;
+    margin-top: 2px;
+  }
+
+  &__header-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  &__canvas-wrap {
+    width: 375px;
+    overflow: hidden;
+    border-bottom: 3px solid #3E2731;
+  }
+
+  &__status {
+    padding: 12px 16px;
+    width: 100%;
+    max-width: 375px;
+    text-align: center;
+  }
+
+  &__status-text {
+    font-size: 14px;
+    color: #FFF8E7;
+    font-family: 'Courier New', monospace;
+
+    &--urgent {
+      color: #FF6B6B;
+      font-size: 16px;
+      font-weight: bold;
+      animation: blink 0.5s infinite alternate;
+    }
+  }
+
+  &__controls {
+    padding: 8px 16px;
+    width: 100%;
+    max-width: 375px;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__selectors {
+    display: flex;
+    gap: 12px;
+    padding: 8px 16px;
+    width: 100%;
+    max-width: 375px;
+  }
+
+  &__selector {
+    flex: 1;
+    background: #FFF8E7;
+    border: 2px solid #3E2731;
+    padding: 8px 12px;
+    cursor: pointer;
+
+    &:active {
+      background: #F0E8D0;
+    }
+  }
+
+  &__selector-label {
+    font-size: 11px;
+    color: #888;
+    display: block;
+  }
+
+  &__selector-value {
+    font-size: 13px;
+    font-weight: bold;
+    color: #3E2731;
+    display: block;
+    margin-top: 2px;
+  }
+
+  &__debug {
+    margin-top: 12px;
+    padding: 12px 16px;
+    width: 100%;
+    max-width: 375px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px dashed #666;
+  }
+
+  &__debug-title {
+    font-size: 11px;
+    color: #AAA;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  &__debug-actions {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+.catch-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+
+  &__content {
+    width: 90%;
+    max-width: 320px;
+  }
+
+  &__fish {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0;
+  }
+
+  &__fish-icon {
+    width: 64px;
+    height: 48px;
+    border: 3px solid #3E2731;
+    image-rendering: pixelated;
+  }
+
+  &__fish-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: #3E2731;
+    font-family: 'Courier New', monospace;
+  }
+
+  &__fish-rarity {
+    font-size: 12px;
+    color: #888;
+  }
+
+  &__fish-desc {
+    font-size: 13px;
+    color: #555;
+    text-align: center;
+    line-height: 1.5;
+    padding: 0 8px;
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 4px;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+  }
+}
+
+@keyframes blink {
+  from { opacity: 1; }
+  to { opacity: 0.5; }
+}

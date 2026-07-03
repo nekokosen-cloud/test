@@ -1,0 +1,16 @@
+export default defineAppConfig({
+  pages: [
+    'pages/fishing/index',
+    'pages/encyclopedia/index',
+  ],
+  window: {
+    backgroundTextStyle: 'light',
+    navigationBarBackgroundColor: '#5FA088',
+    navigationBarTitleText: '像素钓鱼',
+    navigationBarTextStyle: 'white',
+  },
+});
+
+function defineAppConfig(config: Taro.AppConfig): Taro.AppConfig {
+  return config;
+}

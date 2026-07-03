@@ -1,0 +1,95 @@
+.pixel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background: #E8A838;
+  border: 3px solid #3E2731;
+  box-shadow: 3px 3px 0 #3E2731;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.05s, box-shadow 0.05s;
+
+  &:active:not(.pixel-btn--disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 #3E2731;
+  }
+
+  &--primary {
+    background: #E8A838;
+  }
+
+  &--secondary {
+    background: #5FA088;
+    .pixel-btn__text { color: #FFFFFF; }
+  }
+
+  &--danger {
+    background: #E74C3C;
+    .pixel-btn__text { color: #FFFFFF; }
+  }
+
+  &--small {
+    padding: 6px 12px;
+    border-width: 2px;
+    box-shadow: 2px 2px 0 #3E2731;
+  }
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &__text {
+    font-size: 14px;
+    font-weight: bold;
+    color: #3E2731;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+  }
+}
+
+.pixel-panel {
+  background: #FFF8E7;
+  border: 3px solid #3E2731;
+  box-shadow: 4px 4px 0 #3E2731;
+  padding: 16px;
+  border-radius: 0;
+
+  &__title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #3E2731;
+    margin-bottom: 12px;
+    display: block;
+    font-family: 'Courier New', monospace;
+    border-bottom: 2px dashed #E8A838;
+    padding-bottom: 8px;
+  }
+}
+
+.pixel-tag {
+  display: inline-flex;
+  padding: 2px 8px;
+  border: 2px solid;
+  margin: 2px;
+
+  &__text {
+    font-size: 11px;
+    font-family: 'Courier New', monospace;
+  }
+}
+
+.rarity-stars {
+  display: flex;
+  gap: 2px;
+
+  &__star {
+    font-size: 14px;
+    color: #CCC;
+
+    &--active {
+      color: #E8A838;
+    }
+  }
+}
