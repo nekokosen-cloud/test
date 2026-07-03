@@ -11,6 +11,7 @@ import {
   getStatusMessage,
   WARN_FULLNESS,
 } from '@/game/koi/koiSimulation';
+import { GameTabBar } from '@/components/GameTabBar';
 import type { KoiSkin } from '@/types';
 import './index.scss';
 
@@ -93,10 +94,6 @@ export default function KoiPage() {
 
   const isWarning = koi?.isAlive && (koi.fullness >= WARN_FULLNESS || koi.hunger >= 80);
 
-  function goBack() {
-    Taro.navigateBack();
-  }
-
   function handleAdopt() {
     adoptKoi(nameInput, skin);
     setShowAdoptModal(false);
@@ -134,7 +131,6 @@ export default function KoiPage() {
   return (
     <View className="koi-page">
       <View className="koi-page__header">
-        <PixelButton label="返回" onClick={goBack} variant="secondary" small />
         <Text className="koi-page__title">锦鲤池塘</Text>
         <View className="koi-page__header-actions">
           {hasGoldBonus && <PixelTag label="金锦鲤加成" color="#E8A838" />}
@@ -290,6 +286,8 @@ export default function KoiPage() {
           </View>
         </View>
       )}
+
+      <GameTabBar active="koi" />
     </View>
   );
 }
