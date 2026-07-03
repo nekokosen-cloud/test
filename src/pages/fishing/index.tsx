@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text } from '@tarojs/components';
-import Taro from '@tarojs/taro';
 import PixelCanvas from '@/components/PixelCanvas';
 import FishSprite from '@/components/FishSprite';
 import { PixelButton, PixelPanel, PixelTag, RarityStars } from '@/components/PixelUI';
@@ -10,6 +9,7 @@ import { vibrateBite, vibrateReel } from '@/systems/vibration';
 import { getRarityStars, getRarityLabel } from '@/systems/dropTable';
 import { getRarityBorderColor } from '@/game/renderer/fishSprites';
 import { getWeatherIcon } from '@/systems/weather';
+import { GameTabBar } from '@/components/GameTabBar';
 import type { Environment, EnvironmentId, Fish, FishingState, WeatherId } from '@/types';
 import environmentsData from '@/data/environments.json';
 import weatherData from '@/data/weather.json';
@@ -111,14 +111,6 @@ export default function FishingPage() {
     setIsNewDiscovery(false);
   }
 
-  function goToEncyclopedia() {
-    Taro.navigateTo({ url: '/pages/encyclopedia/index' });
-  }
-
-  function goToKoi() {
-    Taro.navigateTo({ url: '/pages/koi/index' });
-  }
-
   function cycleWeather() {
     const ids: WeatherId[] = ['sunny', 'cloudy', 'rainy', 'foggy'];
     const idx = ids.indexOf(weatherId);
@@ -142,10 +134,6 @@ export default function FishingPage() {
           <Text className="fishing-page__weather">
             {getWeatherIcon(weatherId)} {weather.name}
           </Text>
-        </View>
-        <View className="fishing-page__header-actions">
-          <PixelButton label="锦鲤" onClick={goToKoi} variant="secondary" small />
-          <PixelButton label="图鉴" onClick={goToEncyclopedia} variant="secondary" small />
         </View>
       </View>
 
@@ -232,6 +220,8 @@ export default function FishingPage() {
           </View>
         </View>
       )}
+
+      <GameTabBar active="fishing" />
     </View>
   );
 }

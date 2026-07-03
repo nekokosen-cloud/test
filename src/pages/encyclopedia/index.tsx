@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react';
 import { View, Text } from '@tarojs/components';
-import Taro from '@tarojs/taro';
 import FishSprite from '@/components/FishSprite';
 import { PixelButton, PixelPanel, PixelTag, RarityStars } from '@/components/PixelUI';
 import { usePlayerStore } from '@/stores/playerStore';
 import { getAllFish, getRarityLabel, getRarityStars } from '@/systems/dropTable';
 import { getRarityBorderColor } from '@/game/renderer/fishSprites';
 import { getWeatherIcon } from '@/systems/weather';
+import { GameTabBar } from '@/components/GameTabBar';
 import type { Fish, FishRarity } from '@/types';
 import environmentsData from '@/data/environments.json';
 import weatherData from '@/data/weather.json';
@@ -44,10 +44,6 @@ export default function EncyclopediaPage() {
     });
   }, [filter, save.caughtFish]);
 
-  function goBack() {
-    Taro.navigateBack();
-  }
-
   function formatDate(iso: string): string {
     try {
       return new Date(iso).toLocaleDateString('zh-CN');
@@ -59,9 +55,6 @@ export default function EncyclopediaPage() {
   return (
     <View className="encyclopedia-page">
       <View className="encyclopedia-page__header">
-        <View className="encyclopedia-page__back" onClick={goBack}>
-          <Text className="encyclopedia-page__back-text">← 返回</Text>
-        </View>
         <Text className="encyclopedia-page__title">鱼种图鉴</Text>
         <Text className="encyclopedia-page__progress">
           {discoveredCount}/{totalCount}
@@ -194,6 +187,8 @@ export default function EncyclopediaPage() {
           </View>
         </View>
       )}
+
+      <GameTabBar active="encyclopedia" />
     </View>
   );
 }
