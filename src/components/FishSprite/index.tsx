@@ -1,8 +1,8 @@
-import { useEffect, useId } from 'react';
+import { useEffect, useRef } from 'react';
 import { Canvas } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import type { Fish } from '@/types';
-import { drawFishPixelArt, getFishSpriteDataUrl } from '@/game/renderer/fishSprites';
+import { drawFishPixelArt } from '@/game/renderer/fishSprites';
 
 interface FishSpriteProps {
   fish: Fish;
@@ -17,11 +17,13 @@ export default function FishSprite({
   silhouette = false,
   className = '',
 }: FishSpriteProps) {
-  const uid = useId().replace(/:/g, '');
-  const canvasId = `fish-sprite-${fish.id}-${size}-${uid}`;
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const canvasId = `fish-${fish.id}-${size}-${silhouette ? 's' : 'c'}`;
 
-  const renderToCanvas = (canvas: HTMLCanvasElement | null) => {
+  const paint = (canvas: HTMLCanvasElement | null) => {
     if (!canvas) return;
+    canvas.width = size;
+    canvas.height = size;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     drawFishPixelArt(ctx, fish, size, { silhouette, showBackground: true });
@@ -29,10 +31,9 @@ export default function FishSprite({
 
   useEffect(() => {
     if (process.env.TARO_ENV === 'h5') {
-      const el = document.getElementById(canvasId) as HTMLCanvasElement | null;
-      renderToCanvas(el);
+      paint(canvasRef.current);
     }
-  }, [fish, size, silhouette, canvasId]);
+  }, [fish.id, fish.color, fish.accentColor, size, silhouette]);
 
   const style = {
     width: `${size}px`,
@@ -42,15 +43,14 @@ export default function FishSprite({
   };
 
   if (process.env.TARO_ENV === 'h5') {
-    const dataUrl = getFishSpriteDataUrl(fish, size, silhouette);
     return (
-      <img
-        src={dataUrl}
-        alt={fish.name}
-        className={className}
-        style={style}
+      <canvas
+        ref={canvasRef}
+        id={canvasId}
         width={size}
         height={size}
+        className={className}
+        style={style}
       />
     );
   }
@@ -68,11 +68,7 @@ export default function FishSprite({
           .fields({ node: true, size: true })
           .exec((res) => {
             const node = res[0]?.node as HTMLCanvasElement | undefined;
-            if (node) {
-              node.width = size;
-              node.height = size;
-              renderToCanvas(node);
-            }
+            if (node) paint(node);
           });
       }}
     />
