@@ -1,0 +1,36 @@
+export const LEVELS = [
+  {
+    id: 1,
+    name: "深空站",
+    timeLimit: 45,
+    theme: "space",
+    spawn: { x: -3.8, z: -3.2 },
+    hole: { x: 1.2, z: 3.75, radius: 0.34 },
+    fallThreshold: -1.2,
+    ballRadius: 0.14,
+    segments: [
+      { from: { x: -3.8, z: -3.2 }, to: { x: -3.8, z: -0.8 }, width: 1.15 },
+      { from: { x: -3.8, z: -0.8 }, to: { x: -1.0, z: -0.8 }, width: 1.15 },
+      { from: { x: -1.0, z: -0.8 }, to: { x: -1.0, z: 1.4 }, width: 1.15 },
+      { from: { x: -1.0, z: 1.4 }, to: { x: 1.2, z: 1.4 }, width: 1.15 },
+      { from: { x: 1.2, z: 1.4 }, to: { x: 1.2, z: 3.2 }, width: 1.15 },
+    ],
+  },
+  {
+    id: 2,
+    name: "星云桥",
+    timeLimit: 40,
+    theme: "nebula",
+    spawn: { x: 0, z: -4.2 },
+    hole: { x: 0, z: 4.2, radius: 0.32 },
+    fallThreshold: -1.2,
+    ballRadius: 0.14,
+    segments: [
+      { from: { x: 0, z: -4.2 }, to: { x: 0, z: -1.8 }, width: 1.0 },
+      { from: { x: 0, z: -1.8 }, to: { x: -2.2, z: 0.2 }, width: 1.0 },
+      { from: { x: -2.2, z: 0.2 }, to: { x: 2.2, z: 0.2 }, width: 0.72 },
+      { from: { x: 2.2, z: 0.2 }, to: { x: 0, z: 2.2 }, width: 1.0 },
+      { from: { x: 0, z: 2.2 }, to: { x: 0, z: 3.6 }, width: 1.0 },
+    ],
+  },
+];

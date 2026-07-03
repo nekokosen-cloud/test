@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#020308" />
+  <title>Space Ball</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="game-canvas"></canvas>
+
+    <div id="hud">
+      <div class="hud-top">
+        <div>
+          <div class="title">Space Ball</div>
+          <div id="level-label" class="subtitle">第 1 关 · 深空站</div>
+        </div>
+        <div class="timer-box">
+          <div class="timer-label">剩余</div>
+          <div id="timer" class="timer-value">45</div>
+        </div>
+      </div>
+      <div id="hint" class="hint">倾斜手机，把小球滚进虫洞</div>
+    </div>
+
+    <div id="overlay" class="overlay visible">
+      <div class="card">
+        <h1 id="overlay-title">Space Ball</h1>
+        <p id="overlay-message">固定俯视 3D 迷宫。倾斜 iPhone 控制重力，限时内滚进发光虫洞。</p>
+        <div class="actions">
+          <button id="secondary-btn" class="btn secondary hidden" type="button">重试</button>
+          <button id="primary-btn" class="btn primary" type="button">开始游戏</button>
+        </div>
+        <p class="footnote">Safari 需点击按钮授权「动作与方向」传感器</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+    }
+  }
+  </script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
