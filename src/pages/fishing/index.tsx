@@ -115,6 +115,10 @@ export default function FishingPage() {
     Taro.navigateTo({ url: '/pages/encyclopedia/index' });
   }
 
+  function goToKoi() {
+    Taro.navigateTo({ url: '/pages/koi/index' });
+  }
+
   function cycleWeather() {
     const ids: WeatherId[] = ['sunny', 'cloudy', 'rainy', 'foggy'];
     const idx = ids.indexOf(weatherId);
@@ -140,6 +144,7 @@ export default function FishingPage() {
           </Text>
         </View>
         <View className="fishing-page__header-actions">
+          <PixelButton label="锦鲤" onClick={goToKoi} variant="secondary" small />
           <PixelButton label="图鉴" onClick={goToEncyclopedia} variant="secondary" small />
         </View>
       </View>

@@ -93,3 +93,63 @@ export interface FishingVisualState {
   caughtFishId: string | null;
   isNewDiscovery: boolean;
 }
+
+export type KoiSkin = 'common' | 'gold';
+export type KoiGrowthStage = 0 | 1 | 2 | 3 | 4;
+export type KoiDeathReason = 'overfed' | 'starved';
+
+export interface KoiState {
+  id: string;
+  name: string;
+  skin: KoiSkin;
+  hunger: number;
+  fullness: number;
+  happiness: number;
+  health: number;
+  growthStage: KoiGrowthStage;
+  ageHours: number;
+  feedCount: number;
+  dangerFeedCount: number;
+  everDangerFed: boolean;
+  bornAt: string;
+  lastUpdatedAt: string;
+  lastPetAt: string | null;
+  isAlive: boolean;
+  deathReason: KoiDeathReason | null;
+  deathMessage: string;
+}
+
+export interface KoiSave {
+  koi: KoiState | null;
+  totalRaised: number;
+  bestStageReached: number;
+}
+
+export interface KoiStageConfig {
+  stage: KoiGrowthStage;
+  name: string;
+  sizePx: number;
+  minAgeHours: number;
+  minFeedCount: number;
+  requiresGoodCare?: boolean;
+  requiresNeverDanger?: boolean;
+}
+
+export interface KoiParticle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  maxLife: number;
+  color: string;
+  size: number;
+  type: 'food' | 'heart' | 'bubble';
+}
+
+export interface KoiVisualState {
+  frame: number;
+  petBurst: number;
+  feedBurst: number;
+  particles: KoiParticle[];
+}
