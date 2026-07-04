@@ -1,0 +1,19 @@
+{
+  "description": "像素风钓鱼微信小游戏",
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": false,
+    "postcss": false,
+    "compileHotReLoad": false,
+    "minified": true
+  },
+  "compileType": "game",
+  "libVersion": "3.3.5",
+  "appid": "wx2f02c0b1839018b2",
+  "projectname": "pixel-fishing-game"
+}
