@@ -2,7 +2,7 @@
   "name": "pixel-fishing",
   "version": "1.0.0",
   "private": true,
-  "description": "像素风钓鱼小游戏 - H5 / 微信小程序",
+  "description": "像素风钓鱼小游戏 - H5 / 微信小游戏",
   "templateInfo": {
     "name": "pixel-fishing",
     "typescript": true,
@@ -12,8 +12,10 @@
   "scripts": {
     "build:weapp": "taro build --type weapp",
     "build:h5": "taro build --type h5",
+    "build:minigame": "webpack --config webpack.minigame.js",
     "dev:weapp": "npm run build:weapp -- --watch",
-    "dev:h5": "npm run build:h5 -- --watch"
+    "dev:h5": "npm run build:h5 -- --watch",
+    "dev:minigame": "webpack --config webpack.minigame.js --watch"
   },
   "browserslist": [
     "last 3 versions",
@@ -43,10 +45,14 @@
     "@tarojs/taro-loader": "4.2.0",
     "@tarojs/webpack5-runner": "4.2.0",
     "@types/react": "^18.3.0",
+    "@types/wechat-miniprogram": "^3.4.8",
     "@types/webpack-env": "^1.18.0",
     "babel-preset-taro": "4.2.0",
+    "copy-webpack-plugin": "^12.0.2",
     "sass": "^1.77.0",
+    "ts-loader": "^9.5.1",
     "typescript": "^5.4.0",
-    "webpack": "^5.91.0"
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4"
   }
 }

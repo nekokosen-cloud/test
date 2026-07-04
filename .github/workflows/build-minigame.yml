@@ -1,0 +1,37 @@
+name: Build MiniGame
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/minigame/**'
+      - 'src/game/**'
+      - 'src/systems/**'
+      - 'src/data/**'
+      - 'minigame-static/**'
+      - 'webpack.minigame.js'
+  workflow_dispatch:
+
+jobs:
+  build-minigame:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build:minigame
+
+      - name: Pack game-dist zip
+        run: |
+          cd game-dist && zip -r ../pixel-fishing-minigame.zip .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pixel-fishing-minigame
+          path: pixel-fishing-minigame.zip
+          retention-days: 30

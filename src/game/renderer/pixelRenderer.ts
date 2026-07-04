@@ -1,4 +1,4 @@
-import type { Environment, Fish, Particle, Weather, WeatherId } from '@/types';
+import type { Fish, Particle, Weather } from '@/types';
 import { drawFishPixelArt } from '@/game/renderer/fishSprites';
 
 const PIXEL = 4;

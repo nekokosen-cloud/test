@@ -1,6 +1,8 @@
 node_modules/
 dist/
+game-dist/
 pixel-fishing-weapp.zip
+pixel-fishing-minigame.zip
 .swc/
 .DS_Store
 *.log
