@@ -46,9 +46,32 @@ npm run dev:weapp
 
 ### 发布前
 
-1. 在 [`project.config.json`](project.config.json) 和 [`dist/project.config.json`](dist/project.config.json) 填入真实 **AppID**
+1. 在 [`project.config.json`](project.config.json) 填入真实 **小程序 AppID**（必须是「小程序」，不能是「小游戏」）
 2. `npm run build:weapp` 重新打包
 3. 开发者工具 → **上传** → 公众平台提交审核
+
+### 常见错误：`game.json 未找到`
+
+这说明微信把你当前 AppID 当成了 **小游戏**，而本项目是 **小程序**（入口是 `app.json`，不是 `game.json`）。
+
+**解决办法：**
+
+1. 登录 [微信公众平台](https://mp.weixin.qq.com/) → 查看 AppID `wx2f02c0b1839018b2` 的账号类型
+2. 若显示 **「小游戏」** → 需要另外注册一个 **「小程序」** 账号，或使用开发者工具里的 **测试号**
+3. 导入项目时，类型必须选 **「小程序」**，不要选「小游戏」
+4. 导入目录必须是含 **`app.json`** 的 `dist` 文件夹
+
+**检查清单：**
+
+```
+dist/
+├── app.json          ← 必须有
+├── app.js
+├── project.config.json  ← compileType 应为 "miniprogram"
+└── pages/
+```
+
+真机调试 / 预览前，先在开发者工具里确认能正常编译出钓鱼界面，再进行真机调试。
 
 ## 操作说明
 

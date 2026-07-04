@@ -1,7 +1,7 @@
 {
   "miniprogramRoot": "dist/",
   "projectname": "pixel-fishing",
-  "description": "像素风钓鱼小游戏",
+  "description": "像素风钓鱼 - 微信小程序（非小游戏）",
   "appid": "touristappid",
   "setting": {
     "urlCheck": false,
