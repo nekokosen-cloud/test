@@ -9,6 +9,7 @@ export default defineAppConfig({
     navigationBarBackgroundColor: '#5FA088',
     navigationBarTitleText: '像素钓鱼',
     navigationBarTextStyle: 'white',
+    backgroundColor: '#2A4A3A',
   },
 });
 

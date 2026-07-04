@@ -38,6 +38,9 @@ const config = {
         config: {},
       },
     },
+    compile: {
+      include: [],
+    },
   },
   h5: {
     publicPath: '/',

@@ -1,6 +1,5 @@
-import { useEffect, useRef, useCallback } from 'react';
-import { Canvas } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import { useEffect, useRef, useCallback, useState } from 'react';
+import { Canvas, View, Text } from '@tarojs/components';
 import type { Environment, FishingState, Fish, Particle, Weather } from '@/types';
 import {
   drawSky,
@@ -14,8 +13,8 @@ import {
   drawFishSprite,
   spawnSplashParticles,
   updateParticles,
-  PIXEL,
 } from '@/game/renderer/pixelRenderer';
+import { initCanvas2d, startCanvasLoop } from '@/utils/weappCanvas';
 
 interface PixelCanvasProps {
   width: number;
@@ -27,6 +26,8 @@ interface PixelCanvasProps {
   onCanvasTap: () => void;
   screenFlash: number;
 }
+
+const CANVAS_ID = 'fishing-canvas';
 
 export default function PixelCanvas({
   width,
@@ -41,8 +42,8 @@ export default function PixelCanvas({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const frameRef = useRef(0);
   const particlesRef = useRef<Particle[]>([]);
-  const animRef = useRef<number>(0);
   const prevStateRef = useRef<FishingState>('idle');
+  const [canvasReady, setCanvasReady] = useState(process.env.TARO_ENV === 'h5');
   const waterY = Math.floor(height * 0.45);
   const bobberX = width / 2;
 
@@ -52,11 +53,9 @@ export default function PixelCanvas({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    ctx.imageSmoothingEnabled = false;
     frameRef.current += 1;
     const frame = frameRef.current;
 
-    // detect bite transition for splash
     if (fishingState === 'biting' && prevStateRef.current !== 'biting') {
       particlesRef.current = [
         ...particlesRef.current,
@@ -64,73 +63,73 @@ export default function PixelCanvas({
       ];
     }
     prevStateRef.current = fishingState;
-
     particlesRef.current = updateParticles(particlesRef.current);
 
-    // clear
     ctx.clearRect(0, 0, width, height);
-
-    // sky
     drawSky(ctx, width, waterY, environment.skyColor, weather, frame);
-
-    // decor
     drawEnvironmentDecor(ctx, environment.id, width, waterY);
-
-    // water
     drawWaterSurface(ctx, width, waterY, environment.waterColor, frame);
 
-    // fish shadow during bite/waiting
     if (fishingState === 'waiting' || fishingState === 'biting') {
       const alpha = fishingState === 'biting' ? 0.7 : 0.25;
       drawFishShadow(ctx, bobberX, waterY + 20, alpha, frame);
     }
 
-    // rod & character
     drawRod(ctx, frame);
 
-    // bobber
-    const showBobber = ['waiting', 'biting', 'reeling'].includes(fishingState);
-    if (showBobber) {
+    if (['waiting', 'biting', 'reeling'].includes(fishingState)) {
       drawBobber(ctx, bobberX, waterY - 10, fishingState === 'biting', frame);
     }
 
-    // caught fish animation
     if (fishingState === 'caught' && caughtFish) {
       const bounce = Math.abs(Math.sin(frame * 0.15)) * 10;
       drawFishSprite(ctx, bobberX - 20, waterY - 60 - bounce, caughtFish, 1.5);
     }
 
-    // particles
     drawParticles(ctx, particlesRef.current);
-
-    // screen flash for bite feedback
     drawScreenFlash(ctx, width, height, screenFlash);
   }, [width, height, environment, weather, fishingState, caughtFish, screenFlash, waterY, bobberX]);
 
   useEffect(() => {
-    const loop = () => {
-      render();
-      animRef.current = requestAnimationFrame(loop);
-    };
-    animRef.current = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(animRef.current);
-  }, [render]);
+    if (process.env.TARO_ENV === 'h5') {
+      const el = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
+      if (el) {
+        el.width = width;
+        el.height = height;
+        canvasRef.current = el;
+        setCanvasReady(true);
+      }
+    }
+  }, [width, height]);
 
   useEffect(() => {
-    if (process.env.TARO_ENV === 'h5') {
-      const el = document.getElementById('fishing-canvas') as HTMLCanvasElement | null;
-      if (el) canvasRef.current = el;
-    }
-  }, []);
+    if (!canvasReady || !canvasRef.current) return;
 
-  const handleTap = () => {
-    onCanvasTap();
-  };
+    if (process.env.TARO_ENV === 'h5') {
+      let animId = 0;
+      const loop = () => {
+        render();
+        animId = requestAnimationFrame(loop);
+      };
+      animId = requestAnimationFrame(loop);
+      return () => cancelAnimationFrame(animId);
+    }
+
+    return startCanvasLoop(canvasRef.current, render);
+  }, [canvasReady, render]);
+
+  const setupWeappCanvas = useCallback(async () => {
+    const result = await initCanvas2d(`#${CANVAS_ID}`, width, height);
+    if (result) {
+      canvasRef.current = result.canvas;
+      setCanvasReady(true);
+    }
+  }, [width, height]);
 
   if (process.env.TARO_ENV === 'h5') {
     return (
       <canvas
-        id="fishing-canvas"
+        id={CANVAS_ID}
         width={width}
         height={height}
         style={{
@@ -138,37 +137,35 @@ export default function PixelCanvas({
           height: `${height}px`,
           imageRendering: 'pixelated',
           display: 'block',
+          background: '#87CEEB',
         }}
-        onClick={handleTap}
+        onClick={onCanvasTap}
       />
     );
   }
 
   return (
-    <Canvas
-      type="2d"
-      id="fishing-canvas"
-      canvasId="fishing-canvas"
-      style={{
-        width: `${width}px`,
-        height: `${height}px`,
-      }}
-      onTouchStart={handleTap}
-      onReady={() => {
-        Taro.createSelectorQuery()
-          .select('#fishing-canvas')
-          .fields({ node: true, size: true })
-          .exec((res) => {
-            const node = res[0]?.node as HTMLCanvasElement | undefined;
-            if (node) {
-              node.width = width;
-              node.height = height;
-              canvasRef.current = node;
-            }
-          });
-      }}
-    />
+    <View className="pixel-canvas-wrap">
+      {!canvasReady && (
+        <View
+          className="pixel-canvas-fallback"
+          style={{ width: `${width}px`, height: `${height}px` }}
+        >
+          <Text className="pixel-canvas-fallback__text">加载场景中...</Text>
+        </View>
+      )}
+      <Canvas
+        type="2d"
+        id={CANVAS_ID}
+        canvasId={CANVAS_ID}
+        style={{
+          width: `${width}px`,
+          height: `${height}px`,
+          display: canvasReady ? 'block' : 'none',
+        }}
+        onTouchStart={onCanvasTap}
+        onReady={setupWeappCanvas}
+      />
+    </View>
   );
 }
-
-export { PIXEL };

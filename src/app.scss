@@ -18,3 +18,20 @@ page {
 .pixel-font {
   font-family: 'PixelFont', 'Courier New', monospace;
 }
+
+.pixel-canvas-wrap {
+  position: relative;
+}
+
+.pixel-canvas-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #87CEEB;
+
+  &__text {
+    color: #3E2731;
+    font-size: 14px;
+    font-family: 'Courier New', monospace;
+  }
+}

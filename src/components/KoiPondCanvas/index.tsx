@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { Canvas } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Canvas, View, Text } from '@tarojs/components';
 import type { KoiParticle, KoiState } from '@/types';
 import {
   drawKoi,
@@ -13,8 +12,10 @@ import {
   spawnHeartParticles,
   updateKoiParticles,
 } from '@/game/koi/koiRenderer';
+import { initCanvas2d, startCanvasLoop } from '@/utils/weappCanvas';
 
 const FEED_ANIM_FRAMES = 90;
+const CANVAS_ID = 'koi-pond-canvas';
 
 interface KoiPondCanvasProps {
   width: number;
@@ -35,13 +36,13 @@ export default function KoiPondCanvas({
 }: KoiPondCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const frameRef = useRef(0);
-  const animRef = useRef(0);
   const particlesRef = useRef<KoiParticle[]>([]);
   const petBurstRef = useRef(0);
   const feedBurstRef = useRef(0);
   const prevFeedTrigger = useRef(feedTrigger);
   const prevPetTrigger = useRef(petTrigger);
   const bubbleTimerRef = useRef(0);
+  const [canvasReady, setCanvasReady] = useState(process.env.TARO_ENV === 'h5');
 
   const makeDrawParams = (frame: number) => ({
     koi,
@@ -101,41 +102,52 @@ export default function KoiPondCanvas({
   }, [width, height, koi]);
 
   useEffect(() => {
-    const loop = () => {
-      render();
-      animRef.current = requestAnimationFrame(loop);
-    };
-    animRef.current = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(animRef.current);
-  }, [render]);
+    if (process.env.TARO_ENV === 'h5') {
+      const el = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
+      if (el) {
+        el.width = width;
+        el.height = height;
+        canvasRef.current = el;
+        setCanvasReady(true);
+      }
+    }
+  }, [width, height]);
 
   useEffect(() => {
+    if (!canvasReady || !canvasRef.current) return;
+
     if (process.env.TARO_ENV === 'h5') {
-      const el = document.getElementById('koi-pond-canvas') as HTMLCanvasElement | null;
-      if (el) canvasRef.current = el;
+      let animId = 0;
+      const loop = () => {
+        render();
+        animId = requestAnimationFrame(loop);
+      };
+      animId = requestAnimationFrame(loop);
+      return () => cancelAnimationFrame(animId);
     }
-  }, []);
 
-  const handleTap = (clientX: number, clientY: number) => {
+    return startCanvasLoop(canvasRef.current, render);
+  }, [canvasReady, render]);
+
+  const handleTap = (tapX: number, tapY: number) => {
     if (!koi.isAlive) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = width / rect.width;
-    const scaleY = height / rect.height;
-    const tapX = (clientX - rect.left) * scaleX;
-    const tapY = (clientY - rect.top) * scaleY;
-
     if (isTapOnKoi(tapX, tapY, makeDrawParams(frameRef.current))) {
       onPet();
     }
   };
 
+  const setupWeappCanvas = useCallback(async () => {
+    const result = await initCanvas2d(`#${CANVAS_ID}`, width, height);
+    if (result) {
+      canvasRef.current = result.canvas;
+      setCanvasReady(true);
+    }
+  }, [width, height]);
+
   if (process.env.TARO_ENV === 'h5') {
     return (
       <canvas
-        id="koi-pond-canvas"
+        id={CANVAS_ID}
         width={width}
         height={height}
         style={{
@@ -144,38 +156,46 @@ export default function KoiPondCanvas({
           imageRendering: 'pixelated',
           display: 'block',
         }}
-        onClick={(e) => handleTap(e.clientX, e.clientY)}
+        onClick={(e) => {
+          const el = e.currentTarget as HTMLCanvasElement;
+          const rect = el.getBoundingClientRect();
+          handleTap(
+            (e.clientX - rect.left) * (width / rect.width),
+            (e.clientY - rect.top) * (height / rect.height),
+          );
+        }}
       />
     );
   }
 
   return (
-    <Canvas
-      type="2d"
-      id="koi-pond-canvas"
-      canvasId="koi-pond-canvas"
-      style={{
-        width: `${width}px`,
-        height: `${height}px`,
-      }}
-      onTouchStart={(e) => {
-        const touch = e.touches?.[0];
-        if (touch) handleTap(touch.clientX, touch.clientY);
-      }}
-      onReady={() => {
-        Taro.createSelectorQuery()
-          .select('#koi-pond-canvas')
-          .fields({ node: true, size: true })
-          .exec((res) => {
-            const node = res[0]?.node as HTMLCanvasElement | undefined;
-            if (node) {
-              node.width = width;
-              node.height = height;
-              canvasRef.current = node;
-            }
-          });
-      }}
-    />
+    <View className="pixel-canvas-wrap">
+      {!canvasReady && (
+        <View
+          className="pixel-canvas-fallback"
+          style={{ width: `${width}px`, height: `${height}px` }}
+        >
+          <Text className="pixel-canvas-fallback__text">加载池塘中...</Text>
+        </View>
+      )}
+      <Canvas
+        type="2d"
+        id={CANVAS_ID}
+        canvasId={CANVAS_ID}
+        style={{
+          width: `${width}px`,
+          height: `${height}px`,
+          display: canvasReady ? 'block' : 'none',
+        }}
+        onTouchStart={(e) => {
+          const touch = e.touches?.[0];
+          if (touch) {
+            handleTap(touch.x, touch.y);
+          }
+        }}
+        onReady={setupWeappCanvas}
+      />
+    </View>
   );
 }
 
