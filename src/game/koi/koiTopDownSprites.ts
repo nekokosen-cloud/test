@@ -120,7 +120,11 @@ export function drawTopDownKoi(
     ctx.globalAlpha = 0.7;
   }
   if (options.grayed) {
-    ctx.filter = 'grayscale(0.65) brightness(0.9)';
+    try {
+      ctx.filter = 'grayscale(0.65) brightness(0.9)';
+    } catch {
+      ctx.globalAlpha = 0.75;
+    }
   }
 
   const tailPivotX = -8 * ps;

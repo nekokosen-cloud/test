@@ -55,12 +55,14 @@ export class PlayerStore {
   }
 
   getRodZoneBonus(): number {
-    const rod = gearData.rods.find((r) => r.id === this.save.rodId);
+    const rods = gearData?.rods ?? [];
+    const rod = rods.find((r) => r.id === this.save.rodId);
     return rod?.zoneBonus ?? 0;
   }
 
   getBaitCost(): number {
-    const bait = gearData.baits.find((b) => b.id === this.save.baitId);
+    const baits = gearData?.baits ?? [];
+    const bait = baits.find((b) => b.id === this.save.baitId);
     return bait?.cost ?? 0;
   }
 
@@ -78,7 +80,8 @@ export class PlayerStore {
   }
 
   buyRod(rodId: string): boolean {
-    const rod = gearData.rods.find((r) => r.id === rodId);
+    const rods = gearData?.rods ?? [];
+    const rod = rods.find((r) => r.id === rodId);
     if (!rod) return false;
     const owned = this.save.ownedRodIds ?? ['basic'];
     const alreadyOwned = owned.includes(rodId);
@@ -96,7 +99,8 @@ export class PlayerStore {
   }
 
   selectBait(baitId: string): boolean {
-    const bait = gearData.baits.find((b) => b.id === baitId);
+    const baits = gearData?.baits ?? [];
+    const bait = baits.find((b) => b.id === baitId);
     if (!bait) return false;
     this.save = { ...this.save, baitId };
     this.persist();

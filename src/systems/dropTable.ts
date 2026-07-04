@@ -36,7 +36,8 @@ export function getDropTable(
 }
 
 function getBaitMultiplier(baitId: string): number {
-  const bait = gearData.baits.find((b) => b.id === baitId);
+  const baits = gearData?.baits ?? [];
+  const bait = baits.find((b) => b.id === baitId);
   return bait?.rareMultiplier ?? 1;
 }
 

@@ -55,29 +55,17 @@ export class GameApp {
     this.ctx.scale(dpr, dpr);
     this.ctx.imageSmoothingEnabled = false;
 
-    this.raf =
-      typeof this.canvas.requestAnimationFrame === 'function'
-        ? this.canvas.requestAnimationFrame.bind(this.canvas)
-        : requestAnimationFrame;
+    this.raf = this.createRaf();
 
     this.fishing.layout(this.layout);
     this.encyclopedia.layout(this.layout);
     this.koi.layout(this.layout);
-    this.koi.onShow();
 
     mg.onTouchStart(this.onTouchStart.bind(this));
     mg.onTouchMove(this.onTouchMove.bind(this));
     mg.onTouchEnd(this.onTouchEnd.bind(this));
 
-    mg.onShareAppMessage(() => {
-      const fish = this.fishing.consumeSharePending();
-      if (fish) {
-        return {
-          title: `我钓到了传说之鱼【${fish.name}】！快来像素钓鱼挑战吧~`,
-        };
-      }
-      return { title: '像素钓鱼 - 来钓传说之鱼吧！' };
-    });
+    this.registerShareHandler();
 
     console.log(
       `[像素钓鱼] ${this.layout.width}x${this.layout.height}`,
@@ -85,7 +73,37 @@ export class GameApp {
     );
 
     this.lastFrameMs = Date.now();
+    this.render();
     this.loop();
+  }
+
+  private createRaf(): (cb: FrameRequestCallback) => number {
+    if (typeof this.canvas.requestAnimationFrame === 'function') {
+      return this.canvas.requestAnimationFrame.bind(this.canvas);
+    }
+    if (typeof requestAnimationFrame === 'function') {
+      return requestAnimationFrame;
+    }
+    return (cb: FrameRequestCallback) =>
+      setTimeout(() => cb(Date.now()), 16) as unknown as number;
+  }
+
+  private registerShareHandler(): void {
+    try {
+      if (typeof mg.onShareAppMessage === 'function') {
+        mg.onShareAppMessage(() => {
+          const fish = this.fishing.consumeSharePending();
+          if (fish) {
+            return {
+              title: `我钓到了传说之鱼【${fish.name}】！快来像素钓鱼挑战吧~`,
+            };
+          }
+          return { title: '像素钓鱼 - 来钓传说之鱼吧！' };
+        });
+      }
+    } catch (err) {
+      console.warn('[像素钓鱼] 分享接口不可用', err);
+    }
   }
 
   private loop = (): void => {
