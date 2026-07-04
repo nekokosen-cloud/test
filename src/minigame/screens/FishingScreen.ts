@@ -6,20 +6,17 @@ import { drawFishPixelArt, getRarityBorderColor } from '@/game/renderer/fishSpri
 import { getRarityLabel } from '@/systems/dropTable';
 import { safeFillText, setFont } from '@/minigame/ui/fonts';
 import {
-  drawSky,
-  drawWaterSurface,
-  drawEnvironmentDecor,
-  drawBobber,
-  drawRod,
-  drawFishShadow,
-  drawParticles,
-  drawScreenFlash,
-  drawFishSprite,
+  drawFishingScene,
   spawnSplashParticles,
   updateParticles,
-} from '@/game/renderer/pixelRenderer';
+} from '@/minigame/renderer/fishingSceneDraw';
 import { drawPanel, drawPixelButton, drawTextCenter, hitTest, type Rect } from '@/minigame/ui/canvasUI';
 import { loadJsonArray } from '@/minigame/utils/loadJson';
+import {
+  createSceneMetrics,
+  type SceneMetrics,
+  type ScreenLayout,
+} from '@/minigame/layout/screenLayout';
 import * as environmentsModule from '@/data/environments.json';
 import * as weatherModule from '@/data/weather.json';
 import type { EnvironmentId } from '@/types';
@@ -54,12 +51,15 @@ export class FishingScreen {
   private frame = 0;
   private particles: Particle[] = [];
   private prevState: FishingState = 'idle';
+  private screenLayout: ScreenLayout | null = null;
+  private sceneMetrics: SceneMetrics | null = null;
 
   castBtn: Rect = { x: 0, y: 0, w: 0, h: 0 };
   envBtn: Rect = { x: 0, y: 0, w: 0, h: 0 };
   weatherBtn: Rect = { x: 0, y: 0, w: 0, h: 0 };
   dismissBtn: Rect = { x: 0, y: 0, w: 0, h: 0 };
   canvasArea: Rect = { x: 0, y: 0, w: 0, h: 0 };
+  statusY = 0;
 
   constructor() {
     this.fsm = this.createFSM();
@@ -94,15 +94,18 @@ export class FishingScreen {
     );
   }
 
-  layout(w: number, contentH: number): void {
-    const controlsBlock = 110;
-    const sceneH = Math.max(200, Math.min(360, contentH - 52 - controlsBlock - 12));
-    this.canvasArea = { x: 0, y: 52, w: Math.max(1, w), h: sceneH };
-    const controlsY = 52 + sceneH + 10;
-    this.castBtn = { x: w / 2 - 60, y: controlsY, w: 120, h: 40 };
-    this.envBtn = { x: 16, y: controlsY + 46, w: (w - 40) / 2, h: 40 };
-    this.weatherBtn = { x: 24 + (w - 40) / 2, y: controlsY + 46, w: (w - 40) / 2, h: 40 };
-    this.dismissBtn = { x: w / 2 - 70, y: contentH / 2 + 60, w: 140, h: 40 };
+  layout(L: ScreenLayout): void {
+    this.screenLayout = L;
+    this.canvasArea = { x: 0, y: L.sceneY, w: L.width, h: L.sceneH };
+    this.sceneMetrics = createSceneMetrics(L.width, L.sceneH);
+
+    const cy = L.controlsY;
+    const half = (L.width - 40) / 2;
+    this.statusY = cy + 10;
+    this.castBtn = { x: L.width / 2 - 64, y: cy + 28, w: 128, h: 42 };
+    this.envBtn = { x: 16, y: cy + 78, w: half, h: 38 };
+    this.weatherBtn = { x: 24 + half, y: cy + 78, w: half, h: 38 };
+    this.dismissBtn = { x: L.width / 2 - 70, y: L.contentTop + L.contentH / 2, w: 140, h: 40 };
   }
 
   update(): void {
@@ -113,112 +116,99 @@ export class FishingScreen {
     });
     this.frame += 1;
 
-    if (this.fishingState === 'biting' && this.prevState !== 'biting') {
-      const waterY = this.canvasArea.y + this.canvasArea.h * 0.45;
+    if (this.fishingState === 'biting' && this.prevState !== 'biting' && this.sceneMetrics) {
       this.particles = [
         ...this.particles,
-        ...spawnSplashParticles(this.canvasArea.w / 2, waterY, 15),
+        ...spawnSplashParticles(this.sceneMetrics.bobberX, this.sceneMetrics.bobberY + 8, 15),
       ];
     }
     this.prevState = this.fishingState;
     this.particles = updateParticles(this.particles);
   }
 
-  render(ctx: CanvasRenderingContext2D, w: number, contentH: number): void {
-    const env = environments.find((e) => e.id === playerStore.environmentId)
-      ?? environments[0];
-    const weather = weathers.find((wt) => wt.id === playerStore.weatherId)
-      ?? weathers[0];
+  render(ctx: CanvasRenderingContext2D, L: ScreenLayout): void {
+    const env = environments.find((e) => e.id === playerStore.environmentId) ?? environments[0];
+    const weather = weathers.find((wt) => wt.id === playerStore.weatherId) ?? weathers[0];
+    const m = this.sceneMetrics ?? createSceneMetrics(L.width, L.sceneH);
 
-    // 顶部标题栏
+    // 顶部标题栏（含安全区）
     ctx.fillStyle = '#3E2731';
-    ctx.fillRect(0, 0, w, 52);
+    ctx.fillRect(0, L.headerY, L.width, L.headerH);
     ctx.fillStyle = '#E8A838';
-    setFont(ctx, 16, true);
+    setFont(ctx, 15, true);
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
-    safeFillText(ctx, env.name, 16, 22);
+    safeFillText(ctx, env.name, 16, L.headerY + 22);
     ctx.fillStyle = '#FFF8E7';
-    setFont(ctx, 13);
-    safeFillText(ctx, `${WEATHER_LABEL[playerStore.weatherId]} ${weather.name}`, 16, 40);
+    setFont(ctx, 12);
+    safeFillText(ctx, `${WEATHER_LABEL[playerStore.weatherId]} ${weather.name}`, 16, L.headerY + 38);
 
-    // 场景（单独 try，失败不影响按钮）
+    // 场景
+    ctx.save();
+    ctx.translate(this.canvasArea.x, this.canvasArea.y);
+    ctx.beginPath();
+    ctx.rect(0, 0, this.canvasArea.w, this.canvasArea.h);
+    ctx.clip();
+
     try {
-      ctx.save();
-      ctx.translate(this.canvasArea.x, this.canvasArea.y);
-      ctx.beginPath();
-      ctx.rect(0, 0, Math.max(1, this.canvasArea.w), Math.max(1, this.canvasArea.h));
-      ctx.clip();
-
-      const waterY = this.canvasArea.h * 0.45;
-      const bobberX = this.canvasArea.w / 2;
-
-      drawSky(ctx, this.canvasArea.w, waterY, env.skyColor, weather, this.frame);
-      drawEnvironmentDecor(ctx, env.id, this.canvasArea.w, waterY);
-      drawWaterSurface(ctx, this.canvasArea.w, waterY, env.waterColor, this.frame);
-
-      if (this.fishingState === 'waiting' || this.fishingState === 'biting') {
-        drawFishShadow(ctx, bobberX, waterY + 20, this.fishingState === 'biting' ? 0.7 : 0.25, this.frame);
-      }
-
-      drawRod(ctx, this.frame);
-
-      if (['waiting', 'biting', 'reeling'].includes(this.fishingState)) {
-        drawBobber(ctx, bobberX, waterY - 10, this.fishingState === 'biting', this.frame);
-      }
-
-      if (this.fishingState === 'caught' && this.caughtFish) {
-        const bounce = Math.abs(Math.sin(this.frame * 0.15)) * 10;
-        drawFishSprite(ctx, bobberX - 20, waterY - 60 - bounce, this.caughtFish, 1.5);
-      }
-
-      drawParticles(ctx, this.particles);
-      drawScreenFlash(ctx, this.canvasArea.w, this.canvasArea.h, this.screenFlash);
-      ctx.restore();
+      drawFishingScene(
+        ctx,
+        m,
+        env.id,
+        env.skyColor,
+        env.waterColor,
+        weather,
+        this.frame,
+        L.safeRight,
+        this.fishingState,
+        this.caughtFish,
+        this.particles,
+        this.screenFlash,
+      );
     } catch (err) {
       console.error('[像素钓鱼] 场景渲染失败', err);
       ctx.fillStyle = '#87CEEB';
-      ctx.fillRect(0, 52, w, this.canvasArea.h);
+      ctx.fillRect(0, 0, m.width, m.height);
     }
+    ctx.restore();
 
-    // 控件区背景
-    const panelY = this.canvasArea.y + this.canvasArea.h;
-    const panelH = Math.max(0, contentH - panelY);
-    if (panelH > 0) {
-      ctx.fillStyle = '#2A4A3A';
-      ctx.fillRect(0, panelY, w, panelH);
-    }
+    // 控件区
+    ctx.fillStyle = '#2A4A3A';
+    ctx.fillRect(0, L.controlsY, L.width, L.controlsH);
 
     const statusColor = this.fishingState === 'biting' ? '#FF6B6B' : '#FFF8E7';
-    drawTextCenter(ctx, this.statusText, w / 2, this.canvasArea.y + this.canvasArea.h + 20, statusColor, this.fishingState === 'biting' ? 16 : 14);
+    drawTextCenter(ctx, this.statusText, L.width / 2, this.statusY, statusColor, 13);
 
     const canCast = this.fishingState === 'idle';
-    const castLabel = this.fishingState === 'casting' ? '抛竿中...' : this.fishingState === 'waiting' ? '等待中...' : '抛竿';
+    const castLabel = this.fishingState === 'casting'
+      ? '抛竿中...'
+      : this.fishingState === 'waiting'
+        ? '等待中...'
+        : '抛竿';
     drawPixelButton(ctx, this.castBtn, castLabel, { disabled: !canCast });
-
     drawPixelButton(ctx, this.envBtn, '环境', { primary: false, small: true });
     drawPixelButton(ctx, this.weatherBtn, '天气', { primary: false, small: true });
 
     if (this.fishingState === 'caught' && this.caughtFish) {
-      this.renderCatchModal(ctx, w);
+      this.renderCatchModal(ctx, L);
     }
   }
 
-  private renderCatchModal(ctx: CanvasRenderingContext2D, w: number): void {
+  private renderCatchModal(ctx: CanvasRenderingContext2D, L: ScreenLayout): void {
     const fish = this.caughtFish!;
-    const panelW = Math.min(300, w - 40);
-    const panelH = 280;
-    const px = (w - panelW) / 2;
-    const py = 120;
+    const panelW = Math.min(300, L.width - 40);
+    const panelH = 260;
+    const px = (L.width - panelW) / 2;
+    const py = L.contentTop + 40;
 
     ctx.fillStyle = 'rgba(0,0,0,0.6)';
-    ctx.fillRect(0, 0, w, 800);
+    ctx.fillRect(0, L.contentTop, L.width, L.contentBottom - L.contentTop);
 
     drawPanel(ctx, px, py, panelW, panelH, this.isNewDiscovery ? '新发现!' : '钓到了!');
 
-    const spriteSize = 80;
+    const spriteSize = 72;
     const sx = px + panelW / 2 - spriteSize / 2;
-    const sy = py + 50;
+    const sy = py + 44;
     ctx.strokeStyle = getRarityBorderColor(fish.rarity);
     ctx.lineWidth = 3;
     ctx.strokeRect(sx - 4, sy - 4, spriteSize + 8, spriteSize + 8);
@@ -227,14 +217,14 @@ export class FishingScreen {
     drawFishPixelArt(ctx, fish, spriteSize, { showBackground: true });
     ctx.restore();
 
-    drawTextCenter(ctx, fish.name, px + panelW / 2, sy + spriteSize + 24, '#3E2731', 18);
-    drawTextCenter(ctx, getRarityLabel(fish.rarity), px + panelW / 2, sy + spriteSize + 44, '#888', 12);
+    drawTextCenter(ctx, fish.name, px + panelW / 2, sy + spriteSize + 22, '#3E2731', 17);
+    drawTextCenter(ctx, getRarityLabel(fish.rarity), px + panelW / 2, sy + spriteSize + 42, '#888', 12);
 
     ctx.fillStyle = '#555';
-    setFont(ctx, 12);
+    setFont(ctx, 11);
     ctx.textAlign = 'center';
-    const desc = fish.description.length > 28 ? `${fish.description.slice(0, 28)}...` : fish.description;
-    safeFillText(ctx, desc, px + panelW / 2, sy + spriteSize + 64);
+    const desc = fish.description.length > 26 ? `${fish.description.slice(0, 26)}...` : fish.description;
+    safeFillText(ctx, desc, px + panelW / 2, sy + spriteSize + 62);
 
     drawPixelButton(ctx, this.dismissBtn, '继续钓鱼');
   }

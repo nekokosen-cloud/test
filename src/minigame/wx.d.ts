@@ -26,6 +26,18 @@ declare function requestAnimationFrame(callback: FrameRequestCallback): number;
 declare function cancelAnimationFrame(handle: number): void;
 
 declare namespace WechatMiniprogram {
+  interface SystemInfo {
+    safeArea?: {
+      top: number;
+      bottom: number;
+      left: number;
+      right: number;
+      width: number;
+      height: number;
+    };
+    statusBarHeight?: number;
+  }
+
   interface Canvas {
     width: number;
     height: number;

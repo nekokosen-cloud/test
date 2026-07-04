@@ -1,6 +1,7 @@
 import { FishingScreen } from '@/minigame/screens/FishingScreen';
 import { EncyclopediaScreen } from '@/minigame/screens/EncyclopediaScreen';
 import { drawTabBar, hitTest } from '@/minigame/ui/canvasUI';
+import { createScreenLayout, type ScreenLayout } from '@/minigame/layout/screenLayout';
 
 export type ScreenId = 'fishing' | 'encyclopedia';
 
@@ -22,13 +23,10 @@ type MinigameWx = WechatMiniprogram.Wx & {
 
 const mg = wx as MinigameWx;
 
-const TAB_H = 52;
-
 export class GameApp {
   private canvas: WechatMiniprogram.Canvas;
   private ctx: CanvasRenderingContext2D;
-  private width: number;
-  private height: number;
+  private layout: ScreenLayout;
   private screen: ScreenId = 'fishing';
   private fishing = new FishingScreen();
   private encyclopedia = new EncyclopediaScreen();
@@ -39,20 +37,18 @@ export class GameApp {
 
   constructor() {
     const info = wx.getSystemInfoSync();
-    this.width = info.windowWidth || info.screenWidth || 375;
-    this.height = info.windowHeight || info.screenHeight || 667;
+    this.layout = createScreenLayout(info);
     const dpr = info.pixelRatio || 1;
 
     this.canvas = mg.createCanvas();
-    this.canvas.width = Math.floor(this.width * dpr);
-    this.canvas.height = Math.floor(this.height * dpr);
+    this.canvas.width = Math.floor(this.layout.width * dpr);
+    this.canvas.height = Math.floor(this.layout.height * dpr);
 
     const ctx = this.canvas.getContext('2d');
     if (!ctx) {
       throw new Error('无法获取 Canvas 2D 上下文');
     }
     this.ctx = ctx;
-    // 只在初始化时 scale 一次，每帧不调用 setTransform（部分基础库不支持）
     this.ctx.scale(dpr, dpr);
     this.ctx.imageSmoothingEnabled = false;
 
@@ -61,15 +57,17 @@ export class GameApp {
         ? this.canvas.requestAnimationFrame.bind(this.canvas)
         : requestAnimationFrame;
 
-    const contentH = Math.max(200, this.height - TAB_H);
-    this.fishing.layout(this.width, contentH);
-    this.encyclopedia.layout(this.width, contentH);
+    this.fishing.layout(this.layout);
+    this.encyclopedia.layout(this.layout);
 
     mg.onTouchStart(this.onTouchStart.bind(this));
     mg.onTouchMove(this.onTouchMove.bind(this));
     mg.onTouchEnd(this.onTouchEnd.bind(this));
 
-    console.log(`[像素钓鱼] 画布 ${this.width}x${this.height} dpr=${dpr}`);
+    console.log(
+      `[像素钓鱼] ${this.layout.width}x${this.layout.height}`,
+      `safe top=${this.layout.topInset} bottom=${this.layout.bottomInset}`,
+    );
 
     this.loop();
   }
@@ -91,19 +89,20 @@ export class GameApp {
 
   private renderError(err: unknown): void {
     const msg = err instanceof Error ? err.message : String(err);
+    const { width, height } = this.layout;
     this.ctx.globalAlpha = 1;
     this.ctx.fillStyle = '#2A4A3A';
-    this.ctx.fillRect(0, 0, this.width, this.height);
+    this.ctx.fillRect(0, 0, width, height);
     this.ctx.fillStyle = '#E8A838';
-    this.ctx.fillRect(20, 80, this.width - 40, 80);
+    this.ctx.fillRect(20, 80, width - 40, 80);
     this.ctx.fillStyle = '#3E2731';
     this.ctx.font = '13px sans-serif';
     this.ctx.textAlign = 'center';
     try {
-      this.ctx.fillText('渲染出错', this.width / 2, 105);
-      this.ctx.fillText(msg.slice(0, 28), this.width / 2, 130);
+      this.ctx.fillText('渲染出错', width / 2, 105);
+      this.ctx.fillText(msg.slice(0, 28), width / 2, 130);
     } catch {
-      // 文字也失败则只显示色块
+      // ignore
     }
   }
 
@@ -116,19 +115,25 @@ export class GameApp {
   }
 
   private render(): void {
-    const contentH = Math.max(200, this.height - TAB_H);
-
+    const L = this.layout;
     this.ctx.globalAlpha = 1;
     this.ctx.fillStyle = '#2A4A3A';
-    this.ctx.fillRect(0, 0, this.width, this.height);
+    this.ctx.fillRect(0, 0, L.width, L.height);
 
     if (this.screen === 'fishing') {
-      this.fishing.render(this.ctx, this.width, contentH);
+      this.fishing.render(this.ctx, L);
     } else {
-      this.encyclopedia.render(this.ctx, this.width, contentH);
+      this.encyclopedia.render(this.ctx, L);
     }
 
-    this.tabRects = drawTabBar(this.ctx, this.width, TAB_H, contentH, this.screen);
+    this.tabRects = drawTabBar(
+      this.ctx,
+      L.width,
+      L.tabH,
+      L.tabY,
+      this.screen,
+      L.bottomInset,
+    );
   }
 
   private onTouchStart(e: MGTouchEvent): void {
@@ -159,11 +164,10 @@ export class GameApp {
       }
     }
 
-    const contentH = Math.max(200, this.height - TAB_H);
     if (this.screen === 'fishing') {
       this.fishing.handleTap(x, y);
     } else {
-      this.encyclopedia.handleTap(x, y, this.width, contentH);
+      this.encyclopedia.handleTap(x, y, this.layout);
     }
   }
 

@@ -93,6 +93,7 @@ export function drawTabBar(
   h: number,
   y: number,
   active: 'fishing' | 'encyclopedia',
+  bottomInset = 0,
 ): Rect[] {
   const tabs = [
     { id: 'fishing' as const, label: '钓鱼' },
@@ -100,6 +101,7 @@ export function drawTabBar(
   ];
   const tabW = w / tabs.length;
   const rects: Rect[] = [];
+  const labelYOff = Math.max(0, bottomInset * 0.35);
 
   ctx.fillStyle = '#3E2731';
   ctx.fillRect(0, y, w, h);
@@ -109,13 +111,13 @@ export function drawTabBar(
     rects.push(rect);
     if (tab.id === active) {
       ctx.fillStyle = '#E8A838';
-      ctx.fillRect(rect.x + 4, rect.y + 4, rect.w - 8, rect.h - 8);
+      ctx.fillRect(rect.x + 4, rect.y + 4, rect.w - 8, rect.h - 8 - labelYOff);
     }
     ctx.fillStyle = tab.id === active ? '#3E2731' : '#AAA';
     setFont(ctx, 14, true);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    safeFillText(ctx, tab.label, rect.x + rect.w / 2, rect.y + rect.h / 2);
+    safeFillText(ctx, tab.label, rect.x + rect.w / 2, rect.y + (rect.h - labelYOff) / 2);
   });
 
   return rects;
