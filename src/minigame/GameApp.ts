@@ -127,13 +127,7 @@ export class GameApp {
     this.tabRects = drawTabBar(this.ctx, this.width, TAB_H, contentH, this.screen);
 
     if (this.screen === 'fishing') {
-      try {
-        this.fishing.render(this.ctx, this.width, contentH);
-      } catch (err) {
-        console.error('[像素钓鱼] 钓鱼页渲染失败', err);
-        this.ctx.fillStyle = '#87CEEB';
-        this.ctx.fillRect(0, 52, this.width, contentH - 52 - TAB_H);
-      }
+      this.fishing.render(this.ctx, this.width, contentH);
     } else {
       this.encyclopedia.render(this.ctx, this.width, contentH);
     }

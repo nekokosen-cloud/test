@@ -241,17 +241,20 @@ export function drawScreenFlash(ctx: CanvasRenderingContext2D, width: number, he
 
 export function drawRod(ctx: CanvasRenderingContext2D, frame: number): void {
   const s = PIXEL;
-  // fisherman silhouette (simple pixel character)
   drawPixelRect(ctx, 30, 180, s * 2, s * 6, '#3E2731');
   drawPixelRect(ctx, 26, 170, s * 3, s * 2, '#E8A838');
   drawPixelRect(ctx, 28, 165, s * 2, s, '#FFDAB0');
-  // rod
+  const rodEnd = 180 + Math.sin(frame * 0.1) * 3;
   ctx.strokeStyle = '#8B6040';
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(38, 200);
-  const rodEnd = 180 + Math.sin(frame * 0.1) * 3;
-  ctx.quadraticCurveTo(120, rodEnd - 40, 187, rodEnd);
+  try {
+    ctx.quadraticCurveTo(120, rodEnd - 40, 187, rodEnd);
+  } catch {
+    ctx.lineTo(120, rodEnd - 20);
+    ctx.lineTo(187, rodEnd);
+  }
   ctx.stroke();
 }
 
