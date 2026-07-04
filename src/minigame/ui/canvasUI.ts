@@ -31,7 +31,16 @@ export function drawPixelButton(
   setFont(ctx, small ? 12 : 14);
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  safeFillText(ctx, label, rect.x + rect.w / 2, rect.y + rect.h / 2);
+  const lines = label.split('\n');
+  if (lines.length > 1) {
+    const lineH = small ? 14 : 16;
+    const startY = rect.y + rect.h / 2 - ((lines.length - 1) * lineH) / 2;
+    lines.forEach((line, i) => {
+      safeFillText(ctx, line, rect.x + rect.w / 2, startY + i * lineH);
+    });
+  } else {
+    safeFillText(ctx, label, rect.x + rect.w / 2, rect.y + rect.h / 2);
+  }
 }
 
 export function drawPanel(

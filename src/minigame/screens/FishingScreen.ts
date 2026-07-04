@@ -94,8 +94,8 @@ export class FishingScreen {
   }
 
   layout(w: number, contentH: number): void {
-    const sceneH = Math.min(420, contentH - 180);
-    this.canvasArea = { x: 0, y: 52, w, h: sceneH };
+    const sceneH = Math.max(180, Math.min(420, contentH - 180));
+    this.canvasArea = { x: 0, y: 52, w: Math.max(1, w), h: sceneH };
     const controlsY = 52 + sceneH + 8;
     this.castBtn = { x: w / 2 - 60, y: controlsY + 36, w: 120, h: 40 };
     this.envBtn = { x: 16, y: controlsY + 88, w: (w - 40) / 2, h: 44 };
@@ -122,15 +122,29 @@ export class FishingScreen {
     this.particles = updateParticles(this.particles);
   }
 
-  render(ctx: CanvasRenderingContext2D, w: number): void {
-    const env = environments.find((e) => e.id === playerStore.environmentId)!;
-    const weather = weathers.find((wt) => wt.id === playerStore.weatherId)!;
+  render(ctx: CanvasRenderingContext2D, w: number, contentH: number): void {
+    const env = environments.find((e) => e.id === playerStore.environmentId)
+      ?? environments[0];
+    const weather = weathers.find((wt) => wt.id === playerStore.weatherId)
+      ?? weathers[0];
 
-    // 先绘制场景与按钮，避免文字渲染异常导致整帧中断
+    // 顶部标题栏
+    ctx.fillStyle = '#3E2731';
+    ctx.fillRect(0, 0, w, 52);
+    ctx.fillStyle = '#E8A838';
+    setFont(ctx, 16, true);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    safeFillText(ctx, env.name, 16, 22);
+    ctx.fillStyle = '#FFF8E7';
+    setFont(ctx, 13);
+    safeFillText(ctx, `${WEATHER_LABEL[playerStore.weatherId]} ${weather.name}`, 16, 40);
+
+    // 场景区域
     ctx.save();
     ctx.translate(this.canvasArea.x, this.canvasArea.y);
     ctx.beginPath();
-    ctx.rect(0, 0, this.canvasArea.w, this.canvasArea.h);
+    ctx.rect(0, 0, Math.max(1, this.canvasArea.w), Math.max(1, this.canvasArea.h));
     ctx.clip();
 
     const waterY = this.canvasArea.h * 0.45;
@@ -166,20 +180,8 @@ export class FishingScreen {
     const castLabel = this.fishingState === 'casting' ? '抛竿中...' : this.fishingState === 'waiting' ? '等待中...' : '抛竿';
     drawPixelButton(ctx, this.castBtn, castLabel, { disabled: !canCast });
 
-    drawPixelButton(ctx, this.envBtn, `环境\n${env.name}`, { primary: false, small: true });
-    drawPixelButton(ctx, this.weatherBtn, `天气\n${weather.name}`, { primary: false, small: true });
-
-    // 顶部标题栏（深色底 + 文字）
-    ctx.fillStyle = '#3E2731';
-    ctx.fillRect(0, 0, w, 52);
-    ctx.fillStyle = '#E8A838';
-    setFont(ctx, 16, true);
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'alphabetic';
-    safeFillText(ctx, env.name, 16, 22);
-    ctx.fillStyle = '#FFF8E7';
-    setFont(ctx, 13);
-    safeFillText(ctx, `${WEATHER_LABEL[playerStore.weatherId]} ${weather.name}`, 16, 40);
+    drawPixelButton(ctx, this.envBtn, '环境', { primary: false, small: true });
+    drawPixelButton(ctx, this.weatherBtn, '天气', { primary: false, small: true });
 
     if (this.fishingState === 'caught' && this.caughtFish) {
       this.renderCatchModal(ctx, w);

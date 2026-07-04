@@ -29,7 +29,7 @@ export class GameApp {
   private ctx: CanvasRenderingContext2D;
   private width: number;
   private height: number;
-  private dpr: number;
+  private scale: number;
   private screen: ScreenId = 'fishing';
   private fishing = new FishingScreen();
   private encyclopedia = new EncyclopediaScreen();
@@ -40,28 +40,30 @@ export class GameApp {
 
   constructor() {
     const info = wx.getSystemInfoSync();
-    this.width = info.windowWidth || info.screenWidth;
-    this.height = info.windowHeight || info.screenHeight;
-    this.dpr = info.pixelRatio || 1;
+    this.width = info.windowWidth || info.screenWidth || 375;
+    this.height = info.windowHeight || info.screenHeight || 667;
+    const dpr = info.pixelRatio || 1;
 
     this.canvas = mg.createCanvas();
-    this.canvas.width = Math.floor(this.width * this.dpr);
-    this.canvas.height = Math.floor(this.height * this.dpr);
+
+    // 微信小游戏：先设尺寸再取 context，避免渲染坐标错乱
+    this.canvas.width = Math.floor(this.width * dpr);
+    this.canvas.height = Math.floor(this.height * dpr);
 
     const ctx = this.canvas.getContext('2d');
     if (!ctx) {
       throw new Error('无法获取 Canvas 2D 上下文');
     }
     this.ctx = ctx;
-    this.ctx.scale(this.dpr, this.dpr);
-    this.ctx.imageSmoothingEnabled = false;
+    this.scale = dpr;
+    this.resetTransform();
 
     this.raf =
       typeof this.canvas.requestAnimationFrame === 'function'
         ? this.canvas.requestAnimationFrame.bind(this.canvas)
         : requestAnimationFrame;
 
-    const contentH = this.height - TAB_H;
+    const contentH = Math.max(200, this.height - TAB_H);
     this.fishing.layout(this.width, contentH);
     this.encyclopedia.layout(this.width, contentH);
 
@@ -69,13 +71,16 @@ export class GameApp {
     mg.onTouchMove(this.onTouchMove.bind(this));
     mg.onTouchEnd(this.onTouchEnd.bind(this));
 
-    try {
-      wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
-    } catch {
-      // 部分基础库不支持，忽略
-    }
+    console.log(`[像素钓鱼] 画布 ${this.width}x${this.height} dpr=${dpr}`);
 
     this.loop();
+  }
+
+  private resetTransform(): void {
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctx.scale(this.scale, this.scale);
+    this.ctx.imageSmoothingEnabled = false;
+    this.ctx.globalAlpha = 1;
   }
 
   private loop = (): void => {
@@ -84,9 +89,23 @@ export class GameApp {
       this.render();
     } catch (err) {
       console.error('[像素钓鱼] 渲染错误', err);
+      this.renderError(err);
     }
     this.animId = this.raf(this.loop);
   };
+
+  private renderError(err: unknown): void {
+    this.resetTransform();
+    this.ctx.fillStyle = '#2A4A3A';
+    this.ctx.fillRect(0, 0, this.width, this.height);
+    this.ctx.fillStyle = '#E8A838';
+    this.ctx.fillRect(20, 80, this.width - 40, 60);
+    this.ctx.fillStyle = '#3E2731';
+    this.ctx.font = '14px sans-serif';
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText('渲染出错，请看控制台', this.width / 2, 115);
+    console.error(err);
+  }
 
   private update(): void {
     if (this.screen === 'fishing') {
@@ -97,17 +116,27 @@ export class GameApp {
   }
 
   private render(): void {
-    const contentH = this.height - TAB_H;
+    this.resetTransform();
+    const contentH = Math.max(200, this.height - TAB_H);
+
+    // 背景
     this.ctx.fillStyle = '#2A4A3A';
     this.ctx.fillRect(0, 0, this.width, this.height);
 
+    // 先画 Tab 栏，确保底部 UI 可见
+    this.tabRects = drawTabBar(this.ctx, this.width, TAB_H, contentH, this.screen);
+
     if (this.screen === 'fishing') {
-      this.fishing.render(this.ctx, this.width);
+      try {
+        this.fishing.render(this.ctx, this.width, contentH);
+      } catch (err) {
+        console.error('[像素钓鱼] 钓鱼页渲染失败', err);
+        this.ctx.fillStyle = '#87CEEB';
+        this.ctx.fillRect(0, 52, this.width, contentH - 52 - TAB_H);
+      }
     } else {
       this.encyclopedia.render(this.ctx, this.width, contentH);
     }
-
-    this.tabRects = drawTabBar(this.ctx, this.width, TAB_H, contentH, this.screen);
   }
 
   private onTouchStart(e: MGTouchEvent): void {
@@ -138,7 +167,7 @@ export class GameApp {
       }
     }
 
-    const contentH = this.height - TAB_H;
+    const contentH = Math.max(200, this.height - TAB_H);
     if (this.screen === 'fishing') {
       this.fishing.handleTap(x, y);
     } else {
