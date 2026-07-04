@@ -4,12 +4,12 @@
   "description": "像素风钓鱼小游戏",
   "appid": "touristappid",
   "setting": {
-    "urlCheck": true,
-    "es6": false,
-    "enhance": false,
-    "compileHotReLoad": false,
-    "postcss": false,
-    "minified": false
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "compileHotReLoad": true,
+    "postcss": true,
+    "minified": true
   },
   "compileType": "miniprogram"
 }

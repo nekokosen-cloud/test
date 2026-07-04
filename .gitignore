@@ -1,5 +1,6 @@
 node_modules/
 dist/
+pixel-fishing-weapp.zip
 .swc/
 .DS_Store
 *.log

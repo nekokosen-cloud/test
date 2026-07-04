@@ -19,11 +19,36 @@ iPhone Safari 直接打开上面的链接即可，无需开电脑。
 
 ## 微信小程序
 
+### 方式一：本地打包（推荐）
+
+```bash
+npm install
+npm run build:weapp
+```
+
+1. 打开 **微信开发者工具**
+2. 选择 **导入项目**
+3. 目录选择项目里的 **`dist`** 文件夹（不是整个项目根目录）
+4. AppID：填你的小程序 AppID（没有可先选「测试号」体验）
+5. 点击编译，再点 **预览** 扫码真机测试
+
+开发时可用监听模式，改代码自动重新编译：
+
 ```bash
 npm run dev:weapp
 ```
 
-用微信开发者工具打开 `dist` 目录，在 `project.config.json` 中填入你的 AppID。
+开发者工具导入 **项目根目录**（含 `project.config.json`，`miniprogramRoot` 指向 `dist/`），保持 `npm run dev:weapp` 在运行。
+
+### 方式二：下载 GitHub 构建包
+
+仓库 Actions → **Build WeApp** → 最新一次运行 → 下载 `pixel-fishing-weapp` 压缩包，解压后用微信开发者工具导入解压后的文件夹。
+
+### 发布前
+
+1. 在 [`project.config.json`](project.config.json) 和 [`dist/project.config.json`](dist/project.config.json) 填入真实 **AppID**
+2. `npm run build:weapp` 重新打包
+3. 开发者工具 → **上传** → 公众平台提交审核
 
 ## 操作说明
 

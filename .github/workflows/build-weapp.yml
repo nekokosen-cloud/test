@@ -1,0 +1,35 @@
+name: Build WeApp
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'config/**'
+      - 'package.json'
+      - 'project.config.json'
+  workflow_dispatch:
+
+jobs:
+  build-weapp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build:weapp
+
+      - name: Pack dist zip
+        run: |
+          cd dist && zip -r ../pixel-fishing-weapp.zip .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pixel-fishing-weapp
+          path: pixel-fishing-weapp.zip
+          retention-days: 30
