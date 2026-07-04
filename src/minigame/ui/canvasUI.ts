@@ -1,3 +1,5 @@
+import { safeFillText, setFont } from '@/minigame/ui/fonts';
+
 export interface Rect {
   x: number;
   y: number;
@@ -26,10 +28,10 @@ export function drawPixelButton(
   ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
 
   ctx.fillStyle = textColor;
-  ctx.font = `${small ? 12 : 14}px monospace`;
+  setFont(ctx, small ? 12 : 14);
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(label, rect.x + rect.w / 2, rect.y + rect.h / 2);
+  safeFillText(ctx, label, rect.x + rect.w / 2, rect.y + rect.h / 2);
 }
 
 export function drawPanel(
@@ -48,9 +50,9 @@ export function drawPanel(
 
   if (title) {
     ctx.fillStyle = '#3E2731';
-    ctx.font = 'bold 16px monospace';
+    setFont(ctx, 16, true);
     ctx.textAlign = 'center';
-    ctx.fillText(title, x + w / 2, y + 24);
+    safeFillText(ctx, title, x + w / 2, y + 24);
     ctx.strokeStyle = '#E8A838';
     ctx.beginPath();
     ctx.moveTo(x + 12, y + 36);
@@ -68,12 +70,12 @@ export function drawHeader(
   ctx.fillStyle = '#3E2731';
   ctx.fillRect(0, 0, w, 52);
   ctx.fillStyle = '#E8A838';
-  ctx.font = 'bold 16px monospace';
+  setFont(ctx, 16, true);
   ctx.textAlign = 'left';
-  ctx.fillText(title, 16, 22);
+  safeFillText(ctx, title, 16, 22);
   ctx.fillStyle = '#FFF8E7';
-  ctx.font = '13px monospace';
-  ctx.fillText(subtitle, 16, 40);
+  setFont(ctx, 13);
+  safeFillText(ctx, subtitle, 16, 40);
 }
 
 export function drawTabBar(
@@ -101,10 +103,10 @@ export function drawTabBar(
       ctx.fillRect(rect.x + 4, rect.y + 4, rect.w - 8, rect.h - 8);
     }
     ctx.fillStyle = tab.id === active ? '#3E2731' : '#AAA';
-    ctx.font = 'bold 14px monospace';
+    setFont(ctx, 14, true);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(tab.label, rect.x + rect.w / 2, rect.y + rect.h / 2);
+    safeFillText(ctx, tab.label, rect.x + rect.w / 2, rect.y + rect.h / 2);
   });
 
   return rects;
@@ -119,8 +121,8 @@ export function drawTextCenter(
   size = 14,
 ): void {
   ctx.fillStyle = color;
-  ctx.font = `${size}px monospace`;
+  setFont(ctx, size);
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(text, x, y);
+  safeFillText(ctx, text, x, y);
 }

@@ -4,7 +4,7 @@ import { playerStore } from '@/minigame/store/playerStore';
 import { vibrateBite, vibrateReel } from '@/minigame/adapters/vibration';
 import { drawFishPixelArt, getRarityBorderColor } from '@/game/renderer/fishSprites';
 import { getRarityLabel } from '@/systems/dropTable';
-import { getWeatherIcon } from '@/systems/weather';
+import { safeFillText, setFont } from '@/minigame/ui/fonts';
 import {
   drawSky,
   drawWaterSurface,
@@ -34,6 +34,13 @@ const STATUS: Record<FishingState, string> = {
   reeling: '收杆中...',
   caught: '恭喜钓到了！',
   escaped: '鱼跑了！再试一次吧',
+};
+
+const WEATHER_LABEL: Record<WeatherId, string> = {
+  sunny: '晴',
+  cloudy: '云',
+  rainy: '雨',
+  foggy: '雾',
 };
 
 export class FishingScreen {
@@ -119,16 +126,7 @@ export class FishingScreen {
     const env = environments.find((e) => e.id === playerStore.environmentId)!;
     const weather = weathers.find((wt) => wt.id === playerStore.weatherId)!;
 
-    ctx.fillStyle = '#2A4A3A';
-    ctx.fillRect(0, 0, w, 52);
-    ctx.fillStyle = '#E8A838';
-    ctx.font = 'bold 16px monospace';
-    ctx.textAlign = 'left';
-    ctx.fillText(env.name, 16, 22);
-    ctx.fillStyle = '#FFF8E7';
-    ctx.font = '13px monospace';
-    ctx.fillText(`${getWeatherIcon(playerStore.weatherId)} ${weather.name}`, 16, 40);
-
+    // 先绘制场景与按钮，避免文字渲染异常导致整帧中断
     ctx.save();
     ctx.translate(this.canvasArea.x, this.canvasArea.y);
     ctx.beginPath();
@@ -171,6 +169,18 @@ export class FishingScreen {
     drawPixelButton(ctx, this.envBtn, `环境\n${env.name}`, { primary: false, small: true });
     drawPixelButton(ctx, this.weatherBtn, `天气\n${weather.name}`, { primary: false, small: true });
 
+    // 顶部标题栏（深色底 + 文字）
+    ctx.fillStyle = '#3E2731';
+    ctx.fillRect(0, 0, w, 52);
+    ctx.fillStyle = '#E8A838';
+    setFont(ctx, 16, true);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    safeFillText(ctx, env.name, 16, 22);
+    ctx.fillStyle = '#FFF8E7';
+    setFont(ctx, 13);
+    safeFillText(ctx, `${WEATHER_LABEL[playerStore.weatherId]} ${weather.name}`, 16, 40);
+
     if (this.fishingState === 'caught' && this.caughtFish) {
       this.renderCatchModal(ctx, w);
     }
@@ -203,10 +213,10 @@ export class FishingScreen {
     drawTextCenter(ctx, getRarityLabel(fish.rarity), px + panelW / 2, sy + spriteSize + 44, '#888', 12);
 
     ctx.fillStyle = '#555';
-    ctx.font = '12px monospace';
+    setFont(ctx, 12);
     ctx.textAlign = 'center';
     const desc = fish.description.length > 28 ? `${fish.description.slice(0, 28)}...` : fish.description;
-    ctx.fillText(desc, px + panelW / 2, sy + spriteSize + 64);
+    safeFillText(ctx, desc, px + panelW / 2, sy + spriteSize + 64);
 
     drawPixelButton(ctx, this.dismissBtn, '继续钓鱼');
   }

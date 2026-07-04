@@ -2,6 +2,7 @@ import { getAllFish } from '@/systems/dropTable';
 import { drawFishPixelArt, getRarityBorderColor } from '@/game/renderer/fishSprites';
 import { playerStore } from '@/minigame/store/playerStore';
 import { drawTextCenter } from '@/minigame/ui/canvasUI';
+import { safeFillText, setFont } from '@/minigame/ui/fonts';
 import type { Fish } from '@/types';
 
 const allFish = getAllFish();
@@ -63,9 +64,9 @@ export class EncyclopediaScreen {
       ctx.restore();
 
       ctx.fillStyle = discoveredFish ? '#3E2731' : '#888';
-      ctx.font = '11px monospace';
+      setFont(ctx, 11);
       ctx.textAlign = 'center';
-      ctx.fillText(discoveredFish ? fish.name : '???', cx + CELL / 2, cy + CELL - 10);
+      safeFillText(ctx, discoveredFish ? fish.name : '???', cx + CELL / 2, cy + CELL - 10);
     });
 
     ctx.restore();

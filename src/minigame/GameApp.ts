@@ -36,19 +36,30 @@ export class GameApp {
   private tabRects: { x: number; y: number; w: number; h: number }[] = [];
   private animId = 0;
   private lastTouchY = 0;
+  private raf: (cb: FrameRequestCallback) => number;
 
   constructor() {
     const info = wx.getSystemInfoSync();
-    this.width = info.windowWidth;
-    this.height = info.windowHeight;
-    this.dpr = info.pixelRatio || 2;
+    this.width = info.windowWidth || info.screenWidth;
+    this.height = info.windowHeight || info.screenHeight;
+    this.dpr = info.pixelRatio || 1;
 
     this.canvas = mg.createCanvas();
-    this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
-    this.canvas.width = this.width * this.dpr;
-    this.canvas.height = this.height * this.dpr;
+    this.canvas.width = Math.floor(this.width * this.dpr);
+    this.canvas.height = Math.floor(this.height * this.dpr);
+
+    const ctx = this.canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('无法获取 Canvas 2D 上下文');
+    }
+    this.ctx = ctx;
     this.ctx.scale(this.dpr, this.dpr);
     this.ctx.imageSmoothingEnabled = false;
+
+    this.raf =
+      typeof this.canvas.requestAnimationFrame === 'function'
+        ? this.canvas.requestAnimationFrame.bind(this.canvas)
+        : requestAnimationFrame;
 
     const contentH = this.height - TAB_H;
     this.fishing.layout(this.width, contentH);
@@ -58,14 +69,23 @@ export class GameApp {
     mg.onTouchMove(this.onTouchMove.bind(this));
     mg.onTouchEnd(this.onTouchEnd.bind(this));
 
-    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
+    try {
+      wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
+    } catch {
+      // 部分基础库不支持，忽略
+    }
+
     this.loop();
   }
 
   private loop = (): void => {
-    this.update();
-    this.render();
-    this.animId = requestAnimationFrame(this.loop);
+    try {
+      this.update();
+      this.render();
+    } catch (err) {
+      console.error('[像素钓鱼] 渲染错误', err);
+    }
+    this.animId = this.raf(this.loop);
   };
 
   private update(): void {
@@ -127,7 +147,11 @@ export class GameApp {
   }
 
   destroy(): void {
-    cancelAnimationFrame(this.animId);
+    const cancel =
+      typeof this.canvas.cancelAnimationFrame === 'function'
+        ? this.canvas.cancelAnimationFrame.bind(this.canvas)
+        : cancelAnimationFrame;
+    cancel(this.animId);
     this.fishing.destroy();
   }
 }

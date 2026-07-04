@@ -29,5 +29,7 @@ declare namespace WechatMiniprogram {
     width: number;
     height: number;
     getContext(contextType: '2d'): CanvasRenderingContext2D | null;
+    requestAnimationFrame?(callback: FrameRequestCallback): number;
+    cancelAnimationFrame?(handle: number): void;
   }
 }
