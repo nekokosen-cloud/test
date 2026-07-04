@@ -1,9 +1,10 @@
 import type { DropEntry, DropRules, EnvironmentId, Fish, WeatherId } from '@/types';
-import fishData from '@/data/fish.json';
-import dropRulesData from '@/data/dropRules.json';
+import { loadJson, loadJsonArray } from '@/minigame/utils/loadJson';
+import * as fishModule from '@/data/fish.json';
+import * as dropRulesModule from '@/data/dropRules.json';
 
-const fishList = fishData as Fish[];
-const dropRules = dropRulesData as DropRules;
+const fishList = loadJsonArray<Fish>(fishModule);
+const dropRules = loadJson<DropRules>(dropRulesModule);
 
 export function getFishById(id: string): Fish | undefined {
   return fishList.find((f) => f.id === id);

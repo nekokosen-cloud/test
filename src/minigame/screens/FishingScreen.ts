@@ -19,12 +19,13 @@ import {
   updateParticles,
 } from '@/game/renderer/pixelRenderer';
 import { drawPanel, drawPixelButton, drawTextCenter, hitTest, type Rect } from '@/minigame/ui/canvasUI';
-import environmentsData from '@/data/environments.json';
-import weatherData from '@/data/weather.json';
+import { loadJsonArray } from '@/minigame/utils/loadJson';
+import * as environmentsModule from '@/data/environments.json';
+import * as weatherModule from '@/data/weather.json';
 import type { EnvironmentId } from '@/types';
 
-const environments = environmentsData as Environment[];
-const weathers = weatherData as Weather[];
+const environments = loadJsonArray<Environment>(environmentsModule);
+const weathers = loadJsonArray<Weather>(weatherModule);
 
 const STATUS: Record<FishingState, string> = {
   idle: '点击「抛竿」开始钓鱼',

@@ -1,7 +1,8 @@
 import type { Weather, WeatherId } from '@/types';
-import weatherData from '@/data/weather.json';
+import { loadJsonArray } from '@/minigame/utils/loadJson';
+import * as weatherModule from '@/data/weather.json';
 
-const weathers = weatherData as Weather[];
+const weathers = loadJsonArray<Weather>(weatherModule);
 
 export function getAllWeather(): Weather[] {
   return weathers;
