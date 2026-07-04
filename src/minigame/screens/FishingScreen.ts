@@ -180,10 +180,13 @@ export class FishingScreen {
       ctx.fillRect(0, 52, w, this.canvasArea.h);
     }
 
-    // 控件区背景条
+    // 控件区背景
     const panelY = this.canvasArea.y + this.canvasArea.h;
-    ctx.fillStyle = '#2A4A3A';
-    ctx.fillRect(0, panelY, w, contentH - panelY);
+    const panelH = Math.max(0, contentH - panelY);
+    if (panelH > 0) {
+      ctx.fillStyle = '#2A4A3A';
+      ctx.fillRect(0, panelY, w, panelH);
+    }
 
     const statusColor = this.fishingState === 'biting' ? '#FF6B6B' : '#FFF8E7';
     drawTextCenter(ctx, this.statusText, w / 2, this.canvasArea.y + this.canvasArea.h + 20, statusColor, this.fishingState === 'biting' ? 16 : 14);

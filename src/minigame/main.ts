@@ -2,10 +2,6 @@ import { GameApp } from './GameApp';
 
 let app: GameApp | null = null;
 
-type MinigameWx = WechatMiniprogram.Wx & {
-  onShow(callback: () => void): void;
-};
-
 function bootstrap(): void {
   if (app) return;
   try {
@@ -17,11 +13,7 @@ function bootstrap(): void {
 }
 
 if (typeof wx !== 'undefined') {
-  const mg = wx as MinigameWx;
-  mg.onShow(() => {
-    setTimeout(bootstrap, 50);
-  });
-  setTimeout(bootstrap, 200);
+  bootstrap();
 }
 
 export { GameApp, bootstrap };

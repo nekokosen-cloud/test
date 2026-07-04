@@ -29,7 +29,6 @@ export class GameApp {
   private ctx: CanvasRenderingContext2D;
   private width: number;
   private height: number;
-  private scale: number;
   private screen: ScreenId = 'fishing';
   private fishing = new FishingScreen();
   private encyclopedia = new EncyclopediaScreen();
@@ -45,8 +44,6 @@ export class GameApp {
     const dpr = info.pixelRatio || 1;
 
     this.canvas = mg.createCanvas();
-
-    // 微信小游戏：先设尺寸再取 context，避免渲染坐标错乱
     this.canvas.width = Math.floor(this.width * dpr);
     this.canvas.height = Math.floor(this.height * dpr);
 
@@ -55,8 +52,9 @@ export class GameApp {
       throw new Error('无法获取 Canvas 2D 上下文');
     }
     this.ctx = ctx;
-    this.scale = dpr;
-    this.resetTransform();
+    // 只在初始化时 scale 一次，每帧不调用 setTransform（部分基础库不支持）
+    this.ctx.scale(dpr, dpr);
+    this.ctx.imageSmoothingEnabled = false;
 
     this.raf =
       typeof this.canvas.requestAnimationFrame === 'function'
@@ -76,16 +74,13 @@ export class GameApp {
     this.loop();
   }
 
-  private resetTransform(): void {
-    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-    this.ctx.scale(this.scale, this.scale);
-    this.ctx.imageSmoothingEnabled = false;
-    this.ctx.globalAlpha = 1;
-  }
-
   private loop = (): void => {
     try {
       this.update();
+    } catch (err) {
+      console.error('[像素钓鱼] 更新错误', err);
+    }
+    try {
       this.render();
     } catch (err) {
       console.error('[像素钓鱼] 渲染错误', err);
@@ -95,16 +90,21 @@ export class GameApp {
   };
 
   private renderError(err: unknown): void {
-    this.resetTransform();
+    const msg = err instanceof Error ? err.message : String(err);
+    this.ctx.globalAlpha = 1;
     this.ctx.fillStyle = '#2A4A3A';
     this.ctx.fillRect(0, 0, this.width, this.height);
     this.ctx.fillStyle = '#E8A838';
-    this.ctx.fillRect(20, 80, this.width - 40, 60);
+    this.ctx.fillRect(20, 80, this.width - 40, 80);
     this.ctx.fillStyle = '#3E2731';
-    this.ctx.font = '14px sans-serif';
+    this.ctx.font = '13px sans-serif';
     this.ctx.textAlign = 'center';
-    this.ctx.fillText('渲染出错，请看控制台', this.width / 2, 115);
-    console.error(err);
+    try {
+      this.ctx.fillText('渲染出错', this.width / 2, 105);
+      this.ctx.fillText(msg.slice(0, 28), this.width / 2, 130);
+    } catch {
+      // 文字也失败则只显示色块
+    }
   }
 
   private update(): void {
@@ -116,21 +116,19 @@ export class GameApp {
   }
 
   private render(): void {
-    this.resetTransform();
     const contentH = Math.max(200, this.height - TAB_H);
 
-    // 背景
+    this.ctx.globalAlpha = 1;
     this.ctx.fillStyle = '#2A4A3A';
     this.ctx.fillRect(0, 0, this.width, this.height);
-
-    // 先画 Tab 栏，确保底部 UI 可见
-    this.tabRects = drawTabBar(this.ctx, this.width, TAB_H, contentH, this.screen);
 
     if (this.screen === 'fishing') {
       this.fishing.render(this.ctx, this.width, contentH);
     } else {
       this.encyclopedia.render(this.ctx, this.width, contentH);
     }
+
+    this.tabRects = drawTabBar(this.ctx, this.width, TAB_H, contentH, this.screen);
   }
 
   private onTouchStart(e: MGTouchEvent): void {
