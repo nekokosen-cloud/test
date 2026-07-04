@@ -1,0 +1,12 @@
+{
+  "rods": [
+    { "id": "basic", "name": "竹竿", "zoneBonus": 0, "cost": 0 },
+    { "id": "pro", "name": "碳素竿", "zoneBonus": 0.06, "cost": 500 },
+    { "id": "master", "name": "大师竿", "zoneBonus": 0.12, "cost": 2000 }
+  ],
+  "baits": [
+    { "id": "none", "name": "无饵", "rareMultiplier": 1, "cost": 0 },
+    { "id": "worm", "name": "蚯蚓", "rareMultiplier": 1.25, "cost": 15 },
+    { "id": "lure", "name": "亮片", "rareMultiplier": 1.5, "cost": 40 }
+  ]
+}

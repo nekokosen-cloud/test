@@ -22,11 +22,12 @@
       { "fishId": "sturgeon", "weight": 15 }
     ],
     "foggy": [
-      { "fishId": "pike", "weight": 20 },
-      { "fishId": "catfish", "weight": 20 },
-      { "fishId": "ghost_fish", "weight": 15 },
-      { "fishId": "sturgeon", "weight": 20 },
-      { "fishId": "ice_fish", "weight": 25 }
+      { "fishId": "pike", "weight": 18 },
+      { "fishId": "catfish", "weight": 18 },
+      { "fishId": "ghost_fish", "weight": 14 },
+      { "fishId": "sturgeon", "weight": 18 },
+      { "fishId": "ice_fish", "weight": 20 },
+      { "fishId": "moon_carp", "weight": 12 }
     ]
   },
   "river": {
@@ -44,27 +45,30 @@
       { "fishId": "rainbow_trout", "weight": 15 }
     ],
     "rainy": [
-      { "fishId": "trout", "weight": 20 },
-      { "fishId": "salmon", "weight": 25 },
-      { "fishId": "rainbow_trout", "weight": 20 },
-      { "fishId": "eel", "weight": 20 },
-      { "fishId": "sturgeon", "weight": 15 }
+      { "fishId": "trout", "weight": 18 },
+      { "fishId": "salmon", "weight": 22 },
+      { "fishId": "rainbow_trout", "weight": 18 },
+      { "fishId": "eel", "weight": 18 },
+      { "fishId": "thunder_bass", "weight": 14 },
+      { "fishId": "sturgeon", "weight": 10 }
     ],
     "foggy": [
-      { "fishId": "pike", "weight": 25 },
-      { "fishId": "eel", "weight": 25 },
-      { "fishId": "ghost_fish", "weight": 20 },
-      { "fishId": "sturgeon", "weight": 15 },
-      { "fishId": "salmon", "weight": 15 }
+      { "fishId": "pike", "weight": 22 },
+      { "fishId": "eel", "weight": 22 },
+      { "fishId": "ghost_fish", "weight": 18 },
+      { "fishId": "thunder_bass", "weight": 12 },
+      { "fishId": "sturgeon", "weight": 12 },
+      { "fishId": "salmon", "weight": 14 }
     ]
   },
   "ocean": {
     "sunny": [
-      { "fishId": "sardine", "weight": 30 },
-      { "fishId": "mackerel", "weight": 25 },
-      { "fishId": "clownfish", "weight": 20 },
-      { "fishId": "starfish", "weight": 15 },
-      { "fishId": "tuna", "weight": 10 }
+      { "fishId": "sardine", "weight": 28 },
+      { "fishId": "mackerel", "weight": 22 },
+      { "fishId": "clownfish", "weight": 18 },
+      { "fishId": "coral_serpent", "weight": 12 },
+      { "fishId": "starfish", "weight": 12 },
+      { "fishId": "tuna", "weight": 8 }
     ],
     "cloudy": [
       { "fishId": "sardine", "weight": 30 },
@@ -74,18 +78,20 @@
       { "fishId": "eel", "weight": 10 }
     ],
     "rainy": [
-      { "fishId": "mackerel", "weight": 25 },
-      { "fishId": "octopus", "weight": 20 },
-      { "fishId": "king_crab", "weight": 20 },
-      { "fishId": "eel", "weight": 20 },
-      { "fishId": "sardine", "weight": 15 }
+      { "fishId": "mackerel", "weight": 22 },
+      { "fishId": "octopus", "weight": 18 },
+      { "fishId": "king_crab", "weight": 18 },
+      { "fishId": "abyss_angler", "weight": 14 },
+      { "fishId": "eel", "weight": 16 },
+      { "fishId": "sardine", "weight": 12 }
     ],
     "foggy": [
-      { "fishId": "octopus", "weight": 20 },
-      { "fishId": "moon_jelly", "weight": 25 },
-      { "fishId": "ghost_fish", "weight": 15 },
-      { "fishId": "starfish", "weight": 20 },
-      { "fishId": "eel", "weight": 20 }
+      { "fishId": "octopus", "weight": 18 },
+      { "fishId": "moon_jelly", "weight": 22 },
+      { "fishId": "abyss_angler", "weight": 14 },
+      { "fishId": "ghost_fish", "weight": 14 },
+      { "fishId": "starfish", "weight": 16 },
+      { "fishId": "eel", "weight": 16 }
     ]
   },
   "pond": {
@@ -96,11 +102,12 @@
       { "fishId": "turtle", "weight": 15 }
     ],
     "cloudy": [
-      { "fishId": "goldfish", "weight": 30 },
-      { "fishId": "crucian", "weight": 25 },
-      { "fishId": "minnow", "weight": 20 },
-      { "fishId": "lotus_carp", "weight": 15 },
-      { "fishId": "mudskipper", "weight": 10 }
+      { "fishId": "goldfish", "weight": 28 },
+      { "fishId": "crucian", "weight": 22 },
+      { "fishId": "minnow", "weight": 18 },
+      { "fishId": "lotus_carp", "weight": 14 },
+      { "fishId": "mudskipper", "weight": 10 },
+      { "fishId": "crystal_dragon", "weight": 8 }
     ],
     "rainy": [
       { "fishId": "frog", "weight": 25 },
@@ -110,11 +117,12 @@
       { "fishId": "crucian", "weight": 15 }
     ],
     "foggy": [
-      { "fishId": "lotus_carp", "weight": 25 },
-      { "fishId": "ghost_fish", "weight": 20 },
-      { "fishId": "catfish", "weight": 20 },
-      { "fishId": "mudskipper", "weight": 20 },
-      { "fishId": "goldfish", "weight": 15 }
+      { "fishId": "lotus_carp", "weight": 22 },
+      { "fishId": "ghost_fish", "weight": 18 },
+      { "fishId": "catfish", "weight": 18 },
+      { "fishId": "crystal_dragon", "weight": 12 },
+      { "fishId": "mudskipper", "weight": 16 },
+      { "fishId": "goldfish", "weight": 14 }
     ]
   }
 }

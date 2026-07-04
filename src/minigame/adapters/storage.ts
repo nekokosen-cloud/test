@@ -2,18 +2,37 @@ import type { PlayerSave } from '@/types';
 
 const SAVE_KEY = 'pixel_fishing_save';
 
-const DEFAULT_SAVE: PlayerSave = {
+export const DEFAULT_SAVE: PlayerSave = {
   caughtFish: {},
   totalCaught: 0,
-  settings: { vibration: true },
+  coins: 0,
+  bestStreak: 0,
+  currentStreak: 0,
+  environmentId: 'lake',
+  weatherId: 'sunny',
+  timeOfDay: 'day',
+  rodId: 'basic',
+  baitId: 'none',
+  ownedRodIds: ['basic'],
+  settings: { vibration: true, sound: true },
 };
+
+function mergeSave(parsed: Partial<PlayerSave>): PlayerSave {
+  return {
+    ...DEFAULT_SAVE,
+    ...parsed,
+    caughtFish: parsed.caughtFish ?? {},
+    ownedRodIds: parsed.ownedRodIds ?? DEFAULT_SAVE.ownedRodIds,
+    settings: { ...DEFAULT_SAVE.settings, ...(parsed.settings ?? {}) },
+  };
+}
 
 export function loadPlayerSave(): PlayerSave {
   try {
     const data = wx.getStorageSync(SAVE_KEY);
     if (data) {
       const parsed = typeof data === 'string' ? JSON.parse(data) : data;
-      return { ...DEFAULT_SAVE, ...parsed };
+      return mergeSave(parsed);
     }
   } catch {
     // ignore
@@ -29,4 +48,4 @@ export function persistPlayerSave(save: PlayerSave): void {
   }
 }
 
-export { DEFAULT_SAVE, SAVE_KEY };
+export { SAVE_KEY };

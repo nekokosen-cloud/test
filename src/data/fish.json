@@ -322,5 +322,65 @@
     "color": "#B0E8FF",
     "accentColor": "#60C0E0",
     "description": "身体如冰晶般透明的传说之鱼，仅存在于雾夜湖泊。"
+  },
+  {
+    "id": "abyss_angler",
+    "name": "深渊鮟鱇",
+    "rarity": "epic",
+    "environments": ["ocean"],
+    "weather": ["foggy", "rainy"],
+    "timeOfDay": ["night"],
+    "biteWindowMs": 900,
+    "color": "#3A2850",
+    "accentColor": "#FFD700",
+    "description": "深海中的发光猎手，雾雨之夜在远海现身。"
+  },
+  {
+    "id": "thunder_bass",
+    "name": "雷鸣鲈",
+    "rarity": "epic",
+    "environments": ["river"],
+    "weather": ["rainy"],
+    "timeOfDay": ["night", "dusk"],
+    "biteWindowMs": 850,
+    "color": "#4A5080",
+    "accentColor": "#E8E040",
+    "description": "雷雨夜在急流中穿梭的闪电猎手。"
+  },
+  {
+    "id": "crystal_dragon",
+    "name": "晶龙鱼",
+    "rarity": "legendary",
+    "environments": ["pond"],
+    "weather": ["foggy", "cloudy"],
+    "timeOfDay": ["night"],
+    "biteWindowMs": 750,
+    "color": "#A0D0FF",
+    "accentColor": "#6080FF",
+    "description": "池塘深处的传说，鳞片折射星辉。"
+  },
+  {
+    "id": "coral_serpent",
+    "name": "珊瑚蛇鱼",
+    "rarity": "epic",
+    "environments": ["ocean"],
+    "weather": ["sunny"],
+    "timeOfDay": ["day"],
+    "biteWindowMs": 950,
+    "color": "#FF5566",
+    "accentColor": "#FFAA44",
+    "description": "珊瑚礁间的艳丽游者，晴天近海偶现。"
+  },
+  {
+    "id": "moon_carp",
+    "name": "月影鲤",
+    "rarity": "legendary",
+    "environments": ["lake"],
+    "weather": ["cloudy", "foggy"],
+    "timeOfDay": ["dusk", "night"],
+    "biteWindowMs": 780,
+    "color": "#C0C8FF",
+    "accentColor": "#8090FF",
+    "description": "黄昏与月夜下，湖面倒映着它的银色身影。"
   }
 ]

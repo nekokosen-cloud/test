@@ -1,10 +1,24 @@
-import type { DropEntry, DropRules, EnvironmentId, Fish, WeatherId } from '@/types';
+import type { DropEntry, DropRules, EnvironmentId, Fish, FishRarity, TimeOfDay, WeatherId } from '@/types';
 import { loadJson, loadJsonArray } from '@/minigame/utils/loadJson';
 import * as fishModule from '@/data/fish.json';
 import * as dropRulesModule from '@/data/dropRules.json';
+import * as gearModule from '@/data/gear.json';
 
 const fishList = loadJsonArray<Fish>(fishModule);
 const dropRules = loadJson<DropRules>(dropRulesModule);
+
+interface GearData {
+  baits: { id: string; rareMultiplier: number }[];
+}
+
+const gearData = loadJson<GearData>(gearModule);
+
+const RARE_PLUS: FishRarity[] = ['rare', 'epic', 'legendary'];
+
+export interface RollFishOptions {
+  timeOfDay?: TimeOfDay;
+  baitId?: string;
+}
 
 export function getFishById(id: string): Fish | undefined {
   return fishList.find((f) => f.id === id);
@@ -21,12 +35,44 @@ export function getDropTable(
   return dropRules[environmentId]?.[weatherId] ?? [];
 }
 
+function getBaitMultiplier(baitId: string): number {
+  const bait = gearData.baits.find((b) => b.id === baitId);
+  return bait?.rareMultiplier ?? 1;
+}
+
+function filterByTimeOfDay(entries: DropEntry[], timeOfDay: TimeOfDay): DropEntry[] {
+  const filtered = entries.filter((entry) => {
+    const fish = getFishById(entry.fishId);
+    return fish && fish.timeOfDay.includes(timeOfDay);
+  });
+  return filtered.length > 0 ? filtered : entries;
+}
+
+function applyBaitWeights(entries: DropEntry[], baitId: string): DropEntry[] {
+  const mult = getBaitMultiplier(baitId);
+  if (mult <= 1) return entries;
+  return entries.map((entry) => {
+    const fish = getFishById(entry.fishId);
+    if (fish && RARE_PLUS.includes(fish.rarity)) {
+      return { ...entry, weight: entry.weight * mult };
+    }
+    return entry;
+  });
+}
+
 export function rollFish(
   environmentId: EnvironmentId,
   weatherId: WeatherId,
+  options: RollFishOptions = {},
 ): Fish | null {
-  const table = getDropTable(environmentId, weatherId);
+  const timeOfDay = options.timeOfDay ?? 'day';
+  const baitId = options.baitId ?? 'none';
+
+  let table = getDropTable(environmentId, weatherId);
   if (table.length === 0) return null;
+
+  table = filterByTimeOfDay(table, timeOfDay);
+  table = applyBaitWeights(table, baitId);
 
   const totalWeight = table.reduce((sum, entry) => sum + entry.weight, 0);
   let roll = Math.random() * totalWeight;
@@ -71,3 +117,11 @@ export function getRarityStars(rarity: string): number {
   };
   return stars[rarity] ?? 1;
 }
+
+export const RARITY_ORDER: Record<FishRarity, number> = {
+  legendary: 0,
+  epic: 1,
+  rare: 2,
+  uncommon: 3,
+  common: 4,
+};

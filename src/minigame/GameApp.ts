@@ -1,9 +1,9 @@
 import { FishingScreen } from '@/minigame/screens/FishingScreen';
 import { EncyclopediaScreen } from '@/minigame/screens/EncyclopediaScreen';
+import { KoiScreen } from '@/minigame/screens/KoiScreen';
 import { drawTabBar, hitTest } from '@/minigame/ui/canvasUI';
 import { createScreenLayout, type ScreenLayout } from '@/minigame/layout/screenLayout';
-
-export type ScreenId = 'fishing' | 'encyclopedia';
+import type { TabId } from '@/minigame/ui/canvasUI';
 
 interface MGTouch {
   clientX: number;
@@ -19,6 +19,7 @@ type MinigameWx = WechatMiniprogram.Wx & {
   onTouchStart(callback: (e: MGTouchEvent) => void): void;
   onTouchMove(callback: (e: MGTouchEvent) => void): void;
   onTouchEnd(callback: (e: MGTouchEvent) => void): void;
+  onShareAppMessage(callback: () => { title: string; imageUrl?: string }): void;
 };
 
 const mg = wx as MinigameWx;
@@ -27,12 +28,14 @@ export class GameApp {
   private canvas: WechatMiniprogram.Canvas;
   private ctx: CanvasRenderingContext2D;
   private layout: ScreenLayout;
-  private screen: ScreenId = 'fishing';
+  private screen: TabId = 'fishing';
   private fishing = new FishingScreen();
   private encyclopedia = new EncyclopediaScreen();
+  private koi = new KoiScreen();
   private tabRects: { x: number; y: number; w: number; h: number }[] = [];
   private animId = 0;
   private lastTouchY = 0;
+  private lastFrameMs = 0;
   private raf: (cb: FrameRequestCallback) => number;
 
   constructor() {
@@ -59,22 +62,39 @@ export class GameApp {
 
     this.fishing.layout(this.layout);
     this.encyclopedia.layout(this.layout);
+    this.koi.layout(this.layout);
+    this.koi.onShow();
 
     mg.onTouchStart(this.onTouchStart.bind(this));
     mg.onTouchMove(this.onTouchMove.bind(this));
     mg.onTouchEnd(this.onTouchEnd.bind(this));
+
+    mg.onShareAppMessage(() => {
+      const fish = this.fishing.consumeSharePending();
+      if (fish) {
+        return {
+          title: `我钓到了传说之鱼【${fish.name}】！快来像素钓鱼挑战吧~`,
+        };
+      }
+      return { title: '像素钓鱼 - 来钓传说之鱼吧！' };
+    });
 
     console.log(
       `[像素钓鱼] ${this.layout.width}x${this.layout.height}`,
       `safe top=${this.layout.topInset} bottom=${this.layout.bottomInset}`,
     );
 
+    this.lastFrameMs = Date.now();
     this.loop();
   }
 
   private loop = (): void => {
+    const now = Date.now();
+    const dt = Math.min(50, now - this.lastFrameMs);
+    this.lastFrameMs = now;
+
     try {
-      this.update();
+      this.update(dt);
     } catch (err) {
       console.error('[像素钓鱼] 更新错误', err);
     }
@@ -106,11 +126,13 @@ export class GameApp {
     }
   }
 
-  private update(): void {
+  private update(dt: number): void {
     if (this.screen === 'fishing') {
-      this.fishing.update();
-    } else {
+      this.fishing.update(dt);
+    } else if (this.screen === 'encyclopedia') {
       this.encyclopedia.update();
+    } else {
+      this.koi.update(dt);
     }
   }
 
@@ -122,8 +144,10 @@ export class GameApp {
 
     if (this.screen === 'fishing') {
       this.fishing.render(this.ctx, L);
-    } else {
+    } else if (this.screen === 'encyclopedia') {
       this.encyclopedia.render(this.ctx, L);
+    } else {
+      this.koi.render(this.ctx, L);
     }
 
     this.tabRects = drawTabBar(
@@ -140,10 +164,21 @@ export class GameApp {
     const touch = e.touches[0];
     if (!touch) return;
     this.lastTouchY = touch.clientY;
+
+    if (this.screen === 'fishing' && this.fishing.isReelingGame()) {
+      this.fishing.setReelHolding(true);
+      return;
+    }
+
     this.handleTap(touch.clientX, touch.clientY);
   }
 
   private onTouchMove(e: MGTouchEvent): void {
+    if (this.screen === 'fishing' && this.fishing.isReelingGame()) {
+      this.fishing.setReelHolding(true);
+      return;
+    }
+
     if (this.screen !== 'encyclopedia') return;
     const touch = e.touches[0];
     if (!touch) return;
@@ -153,21 +188,31 @@ export class GameApp {
   }
 
   private onTouchEnd(_e: MGTouchEvent): void {
-    // noop
+    if (this.screen === 'fishing') {
+      this.fishing.setReelHolding(false);
+    }
   }
 
   private handleTap(x: number, y: number): void {
+    const tabIds: TabId[] = ['fishing', 'encyclopedia', 'koi'];
     for (let i = 0; i < this.tabRects.length; i++) {
       if (hitTest(x, y, this.tabRects[i])) {
-        this.screen = i === 0 ? 'fishing' : 'encyclopedia';
+        const next = tabIds[i];
+        if (next !== this.screen) {
+          if (this.screen === 'koi') this.koi.onHide();
+          this.screen = next;
+          if (next === 'koi') this.koi.onShow();
+        }
         return;
       }
     }
 
     if (this.screen === 'fishing') {
       this.fishing.handleTap(x, y);
-    } else {
+    } else if (this.screen === 'encyclopedia') {
       this.encyclopedia.handleTap(x, y, this.layout);
+    } else {
+      this.koi.handleTap(x, y);
     }
   }
 
@@ -177,6 +222,9 @@ export class GameApp {
         ? this.canvas.cancelAnimationFrame.bind(this.canvas)
         : cancelAnimationFrame;
     cancel(this.animId);
+    this.koi.onHide();
     this.fishing.destroy();
   }
 }
+
+export type ScreenId = TabId;

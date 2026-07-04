@@ -21,7 +21,7 @@ export interface ScreenLayout {
 
 const HEADER_H = 44;
 const TAB_BASE_H = 44;
-const CONTROLS_H = 112;
+const CONTROLS_H = 118;
 
 export function createScreenLayout(info: WechatMiniprogram.SystemInfo): ScreenLayout {
   const width = info.windowWidth || info.screenWidth || 375;

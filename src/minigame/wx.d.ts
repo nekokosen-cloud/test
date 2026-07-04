@@ -14,10 +14,13 @@ interface MinigameTouchEvent {
 
 interface MinigameWx extends WechatMiniprogram.Wx {
   createCanvas(): WechatMiniprogram.Canvas;
+  createWebAudioContext?(): AudioContext;
   onShow(callback: () => void): void;
   onTouchStart(callback: (e: MinigameTouchEvent) => void): void;
   onTouchMove(callback: (e: MinigameTouchEvent) => void): void;
   onTouchEnd(callback: (e: MinigameTouchEvent) => void): void;
+  onShareAppMessage(callback: () => { title: string; imageUrl?: string }): void;
+  shareAppMessage?(options: { title: string; imageUrl?: string }): void;
 }
 
 declare const wx: MinigameWx;

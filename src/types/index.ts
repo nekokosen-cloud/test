@@ -8,6 +8,7 @@ export type FishingState =
   | 'waiting'
   | 'biting'
   | 'reeling'
+  | 'reeling_game'
   | 'caught'
   | 'escaped';
 
@@ -60,8 +61,18 @@ export interface CaughtFishRecord {
 export interface PlayerSave {
   caughtFish: Record<string, CaughtFishRecord>;
   totalCaught: number;
+  coins: number;
+  bestStreak: number;
+  currentStreak: number;
+  environmentId: EnvironmentId;
+  weatherId: WeatherId;
+  timeOfDay: TimeOfDay;
+  rodId: string;
+  baitId: string;
+  ownedRodIds: string[];
   settings: {
     vibration: boolean;
+    sound: boolean;
   };
 }
 
@@ -69,6 +80,27 @@ export interface GameContext {
   environmentId: EnvironmentId;
   weatherId: WeatherId;
   timeOfDay: TimeOfDay;
+  baitId?: string;
+  rodZoneBonus?: number;
+}
+
+export interface GearRod {
+  id: string;
+  name: string;
+  zoneBonus: number;
+  cost: number;
+}
+
+export interface GearBait {
+  id: string;
+  name: string;
+  rareMultiplier: number;
+  cost: number;
+}
+
+export interface GearData {
+  rods: GearRod[];
+  baits: GearBait[];
 }
 
 export interface Particle {

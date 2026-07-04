@@ -233,9 +233,18 @@ export function drawFishShadow(
   ctx.globalAlpha = 1;
 }
 
-export function drawScreenFlash(ctx: CanvasRenderingContext2D, width: number, height: number, intensity: number): void {
+export function drawScreenFlash(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  intensity: number,
+  color = 'rgba(255,255,255,1)',
+): void {
   if (intensity <= 0) return;
-  ctx.fillStyle = `rgba(255,255,255,${intensity})`;
+  const rgba = color.includes('rgba')
+    ? color.replace(/,\s*[\d.]+\)$/, `, ${intensity})`)
+    : color;
+  ctx.fillStyle = rgba;
   ctx.fillRect(0, 0, width, height);
 }
 

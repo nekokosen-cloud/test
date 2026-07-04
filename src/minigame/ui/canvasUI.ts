@@ -87,17 +87,20 @@ export function drawHeader(
   safeFillText(ctx, subtitle, 16, 40);
 }
 
+export type TabId = 'fishing' | 'encyclopedia' | 'koi';
+
 export function drawTabBar(
   ctx: CanvasRenderingContext2D,
   w: number,
   h: number,
   y: number,
-  active: 'fishing' | 'encyclopedia',
+  active: TabId,
   bottomInset = 0,
 ): Rect[] {
-  const tabs = [
-    { id: 'fishing' as const, label: '钓鱼' },
-    { id: 'encyclopedia' as const, label: '图鉴' },
+  const tabs: { id: TabId; label: string }[] = [
+    { id: 'fishing', label: '钓鱼' },
+    { id: 'encyclopedia', label: '图鉴' },
+    { id: 'koi', label: '锦鲤' },
   ];
   const tabW = w / tabs.length;
   const rects: Rect[] = [];
