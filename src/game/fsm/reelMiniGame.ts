@@ -37,15 +37,26 @@ const BASE: ReelGameConfig = {
   pointerSpeed: 0.0025,
   zoneDrift: 0.00035,
   durationMs: 5000,
-  progressRate: 0.00055,
-  decayRate: 0.00035,
+  progressRate: 0.006,
+  decayRate: 0.003,
 };
+
+/** 在绿色区内约 2.5 秒可填满进度条 */
+function calcProgressRate(durationMs: number): number {
+  const fillSec = 2.5;
+  return 1 / ((fillSec * 1000) / 16.67);
+}
 
 export function createReelGame(fish: Fish, zoneBonus = 0): ReelGameInstance {
   const rarityCfg = RARITY_CONFIG[fish.rarity] ?? {};
+  const durationMs = rarityCfg.durationMs ?? BASE.durationMs;
+  const progressRate = calcProgressRate(durationMs);
   const config: ReelGameConfig = {
     ...BASE,
     ...rarityCfg,
+    durationMs,
+    progressRate,
+    decayRate: progressRate * 0.55,
     zoneSize: Math.min(0.4, (rarityCfg.zoneSize ?? BASE.zoneSize) + zoneBonus),
   };
   return {

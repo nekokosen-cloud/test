@@ -56,4 +56,5 @@ export function drawReelBar(
 
   const remain = Math.max(0, config.durationMs - state.elapsed);
   safeFillText(ctx, `${(remain / 1000).toFixed(1)}s`, x + w / 2, y + h + 36);
+  safeFillText(ctx, `进度 ${Math.round(state.progress * 100)}%`, x + w / 2, y + h + 50);
 }

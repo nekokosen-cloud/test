@@ -171,6 +171,11 @@ export class GameApp {
     }
 
     this.handleTap(touch.clientX, touch.clientY);
+
+    // 咬钩点击收杆后，同一根手指仍按住应继续算收杆
+    if (this.screen === 'fishing' && this.fishing.isReelingGame()) {
+      this.fishing.setReelHolding(true);
+    }
   }
 
   private onTouchMove(e: MGTouchEvent): void {
